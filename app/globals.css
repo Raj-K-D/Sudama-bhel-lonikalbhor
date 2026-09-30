@@ -1,0 +1,41 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-family: 'Georgia', serif;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    background-color: #FFFDF9;
+    color: #1F2421;
+  }
+}
+
+@layer utilities {
+  .font-georgia {
+    font-family: 'Georgia', serif;
+  }
+
+  /* Smooth horizontal scroll for carousels */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* DRY admin form inputs */
+  .input-field {
+    @apply w-full rounded-xl border border-white/10 bg-white/10 px-4 py-2.5 text-sm text-white
+           placeholder-white/30 outline-none focus:border-primary transition-colors;
+  }
+}
+
+/* Pulse animation delay helper */
+.delay-700 {
+  animation-delay: 700ms;
+}

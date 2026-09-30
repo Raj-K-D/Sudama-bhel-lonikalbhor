@@ -1,0 +1,24 @@
+{
+  "name": "Sudama Bhel — Scan & Order",
+  "short_name": "Sudama Bhel",
+  "description": "QR-based table ordering system for Sudama Bhel. Scan your table QR, browse the menu, and order instantly.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FFFDF9",
+  "theme_color": "#D32F2F",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/sudama-logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/sudama-logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable any"
+    }
+  ]
+}
