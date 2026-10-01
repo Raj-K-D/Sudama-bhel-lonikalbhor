@@ -41,3 +41,6 @@ next-env.d.ts
 # Editor directories
 .vscode/
 .idea/
+
+.vercel
+.env*
