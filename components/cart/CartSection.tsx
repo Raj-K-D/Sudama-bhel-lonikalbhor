@@ -241,9 +241,19 @@ export default function CartSection() {
                 }}
                 className="flex-1 rounded-2xl bg-primary py-2.5 font-georgia text-xs font-black text-white hover:bg-primary/90 transition-colors"
               >
-                🔄 Retry
+                🔄 Retry GPS
               </button>
             </div>
+
+            <button
+              onClick={async () => {
+                setGeofenceError(null);
+                await placeOrder();
+              }}
+              className="w-full rounded-2xl bg-amber-50 border border-amber-300 py-2 text-xs font-extrabold text-amber-900 hover:bg-amber-100 transition-colors"
+            >
+              ⚠️ Place Order Anyway (Testing Mode)
+            </button>
           </div>
         </div>
       )}

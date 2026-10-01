@@ -16,10 +16,18 @@ import {
 import { getRestaurantLocation, saveRestaurantLocation } from '@/lib/geofence';
 
 export default function AdminPage() {
-  const { placedOrders, updateOrderStatus, assistanceRequests, dismissAssistance } = useStore();
+  const { placedOrders, updateOrderStatus, assistanceRequests, dismissAssistance, clearTableOrders } = useStore();
   const [muted, setMutedState] = useState(false);
   const [geoConfig, setGeoConfig] = useState<{ lat: number; lng: number; radiusMeters: number; enabled: boolean } | null>(null);
   const [geoNotice, setGeoNotice] = useState<string | null>(null);
+
+  const handleClearAllTables = async () => {
+    if (window.confirm('Are you sure you want to delete ALL orders across all tables? This is useful for clearing test orders.')) {
+      for (const tableNum of activeTables) {
+        await clearTableOrders(tableNum);
+      }
+    }
+  };
 
   useEffect(() => {
     requestNotificationPermission();
@@ -187,7 +195,7 @@ export default function AdminPage() {
           <span>
             Anti-Fake Orders Geofence:{' '}
             <strong className={geoConfig?.enabled ? 'text-accent-green' : 'text-gray-400'}>
-              {geoConfig?.enabled ? 'Active (200m radius)' : 'Disabled (Testing)'}
+              {geoConfig?.enabled ? 'Active (Loni Kalbhor 500m radius)' : 'Disabled (Testing / Demo Mode)'}
             </strong>
           </span>
           {geoNotice && <span className="text-accent-gold font-bold">{geoNotice}</span>}
@@ -226,14 +234,28 @@ export default function AdminPage() {
           </Link>
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {activeTables.map((tableNum) => (
-            <TableOrderCard
-              key={tableNum}
-              tableNum={tableNum}
-              orders={placedOrders[tableNum] ?? []}
-            />
-          ))}
+        <div className="space-y-3">
+          <div className="flex items-center justify-between px-1">
+            <p className="text-xs font-bold text-white/60">
+              {activeTables.length} ACTIVE TABLE{activeTables.length > 1 ? 'S' : ''}
+            </p>
+            <button
+              onClick={handleClearAllTables}
+              className="rounded-xl border border-red-500/30 bg-red-500/10 px-3 py-1.5 text-xs font-bold text-red-300 hover:bg-red-500/20 transition-colors flex items-center gap-1.5"
+            >
+              <span>🧹</span>
+              <span>Clear All Test Orders</span>
+            </button>
+          </div>
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {activeTables.map((tableNum) => (
+              <TableOrderCard
+                key={tableNum}
+                tableNum={tableNum}
+                orders={placedOrders[tableNum] ?? []}
+              />
+            ))}
+          </div>
         </div>
       )}
     </div>

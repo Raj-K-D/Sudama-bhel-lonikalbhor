@@ -58,8 +58,23 @@ CREATE POLICY "anon_upload_menu_images"
 CREATE POLICY "anon_delete_menu_images"
   ON storage.objects FOR DELETE USING (bucket_id = 'menu-images');
 
--- ── Enable Realtime on orders table ──────────────────────────────────────────
+-- ── Table Assistance Requests (Water / Call Waiter) ───────────────────────────
+CREATE TABLE IF NOT EXISTS assistance_requests (
+  id            text PRIMARY KEY,
+  table_number  integer NOT NULL,
+  request_type  text NOT NULL,
+  created_at    timestamptz NOT NULL DEFAULT now()
+);
+
+-- Index for table lookup
+CREATE INDEX IF NOT EXISTS assistance_requests_created_at_idx ON assistance_requests (created_at DESC);
+
+ALTER TABLE assistance_requests ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "allow_all_assistance_requests" ON assistance_requests FOR ALL USING (true) WITH CHECK (true);
+
+-- ── Enable Realtime on tables ────────────────────────────────────────────────
 -- Run in Supabase Dashboard → Database → Replication → Realtime
--- Toggle 'orders' and 'menu_items' tables ON, or run:
+-- Toggle 'orders', 'menu_items', and 'assistance_requests' tables ON, or run:
 ALTER PUBLICATION supabase_realtime ADD TABLE orders;
 ALTER PUBLICATION supabase_realtime ADD TABLE menu_items;
+ALTER PUBLICATION supabase_realtime ADD TABLE assistance_requests;

@@ -31,6 +31,7 @@ interface RestaurantStore {
   updateOrderStatus: (tableNum: number, orderId: string, status: OrderStatus) => void;
   setTableOrdersReady: (tableNum: number) => void;
   cancelOrder: (tableNum: number, orderId: string) => void;
+  clearTableOrders: (tableNum: number) => Promise<void>;
 
   // Table assistance requests (Call Waiter / Water / Clean)
   assistanceRequests: { id: string; tableNumber: number; requestType: string; timestamp: string }[];
@@ -54,6 +55,8 @@ interface RestaurantStore {
 }
 
 // ─── Store ────────────────────────────────────────────────────────────────────
+
+let _assistanceChannel: any = null;
 
 export const useStore = create<RestaurantStore>()(
   persist(
@@ -191,12 +194,30 @@ export const useStore = create<RestaurantStore>()(
       cancelOrder: async (tableNum, orderId) => {
         const orders = { ...get().placedOrders };
         const tableOrders = (orders[tableNum] ?? []).filter((o) => o.id !== orderId);
-        set({ placedOrders: { ...orders, [tableNum]: tableOrders } });
+        if (tableOrders.length === 0) {
+          delete orders[tableNum];
+        } else {
+          orders[tableNum] = tableOrders;
+        }
+        set({ placedOrders: orders });
 
         const sb = getSupabase();
         if (sb) {
           try {
             await sb.from('orders').delete().eq('id', orderId);
+          } catch { /* ignore */ }
+        }
+      },
+
+      clearTableOrders: async (tableNum: number) => {
+        const orders = { ...get().placedOrders };
+        delete orders[tableNum];
+        set({ placedOrders: orders });
+
+        const sb = getSupabase();
+        if (sb) {
+          try {
+            await sb.from('orders').delete().eq('table_number', tableNum);
           } catch { /* ignore */ }
         }
       },
@@ -279,10 +300,39 @@ export const useStore = create<RestaurantStore>()(
           .on('postgres_changes', { event: '*', schema: 'public', table: 'menu_items' }, refetchMenu)
           .subscribe();
 
+        // ── 3. Table Assistance Realtime Broadcast ─────────────────────────
+        if (_assistanceChannel) {
+          try { sb.removeChannel(_assistanceChannel); } catch { /* ignore */ }
+          _assistanceChannel = null;
+        }
+
+        const assistanceChannel = sb.channel('assistance-alerts', {
+          config: { broadcast: { ack: true } },
+        });
+
+        assistanceChannel
+          .on('broadcast', { event: 'call_waiter' }, ({ payload }) => {
+            if (!payload || !payload.id) return;
+            const req = payload as { id: string; tableNumber: number; requestType: string; timestamp: string };
+            const current = get().assistanceRequests.filter(
+              (r) => !(r.tableNumber === req.tableNumber && r.requestType === req.requestType)
+            );
+            set({ assistanceRequests: [req, ...current] });
+          })
+          .on('broadcast', { event: 'dismiss_waiter' }, ({ payload }) => {
+            if (!payload || !payload.id) return;
+            set({ assistanceRequests: get().assistanceRequests.filter((r) => r.id !== payload.id) });
+          })
+          .subscribe();
+
+        _assistanceChannel = assistanceChannel;
+
         set({
           _unsubscribeOrders: () => {
             sb.removeChannel(orderChannel);
             sb.removeChannel(menuChannel);
+            sb.removeChannel(assistanceChannel);
+            _assistanceChannel = null;
           },
         });
       },
@@ -302,10 +352,64 @@ export const useStore = create<RestaurantStore>()(
           (r) => !(r.tableNumber === tableNumber && r.requestType === requestType)
         );
         set({ assistanceRequests: [newReq, ...current] });
+
+        // Broadcast alert across all connected admin/kitchen devices in realtime
+        const sb = getSupabase();
+        if (sb) {
+          try {
+            if (_assistanceChannel) {
+              _assistanceChannel.send({
+                type: 'broadcast',
+                event: 'call_waiter',
+                payload: newReq,
+              }).catch(() => {});
+            } else {
+              const ch = sb.channel('assistance-alerts', { config: { broadcast: { ack: true } } });
+              ch.subscribe((status) => {
+                if (status === 'SUBSCRIBED') {
+                  ch.send({
+                    type: 'broadcast',
+                    event: 'call_waiter',
+                    payload: newReq,
+                  }).catch(() => {});
+                }
+              });
+            }
+          } catch (e) {
+            console.warn('Realtime assistance alert send error:', e);
+          }
+        }
       },
 
       dismissAssistance: (id) => {
         set({ assistanceRequests: get().assistanceRequests.filter((r) => r.id !== id) });
+
+        // Broadcast dismiss event so customer's button and other dashboards update
+        const sb = getSupabase();
+        if (sb) {
+          try {
+            if (_assistanceChannel) {
+              _assistanceChannel.send({
+                type: 'broadcast',
+                event: 'dismiss_waiter',
+                payload: { id },
+              }).catch(() => {});
+            } else {
+              const ch = sb.channel('assistance-alerts', { config: { broadcast: { ack: true } } });
+              ch.subscribe((status) => {
+                if (status === 'SUBSCRIBED') {
+                  ch.send({
+                    type: 'broadcast',
+                    event: 'dismiss_waiter',
+                    payload: { id },
+                  }).catch(() => {});
+                }
+              });
+            }
+          } catch (e) {
+            console.warn('Realtime dismiss alert send error:', e);
+          }
+        }
       },
     }),
     {

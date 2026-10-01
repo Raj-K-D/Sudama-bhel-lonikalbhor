@@ -25,7 +25,7 @@ const STATUS_LABEL: Record<OrderStatus, string> = {
 };
 
 export default function TableOrderCard({ tableNum, orders }: TableOrderCardProps) {
-  const { menu, updateOrderStatus, setTableOrdersReady, cancelOrder } = useStore();
+  const { menu, updateOrderStatus, setTableOrdersReady, cancelOrder, clearTableOrders } = useStore();
   const [toastVisible, setToastVisible] = useState(false);
 
   const hasUnprepared = orders.some((o) => o.status !== 'ready');
@@ -88,9 +88,22 @@ export default function TableOrderCard({ tableNum, orders }: TableOrderCardProps
         >
           TABLE {tableNum}
         </span>
-        <span className="text-xs text-white/60">
-          {orders.length} ticket{orders.length !== 1 ? 's' : ''}
-        </span>
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-white/60">
+            {orders.length} ticket{orders.length !== 1 ? 's' : ''}
+          </span>
+          <button
+            onClick={() => {
+              if (window.confirm(`Clear all orders for Table ${tableNum}? (Table finished / bill paid)`)) {
+                clearTableOrders(tableNum);
+              }
+            }}
+            title="Clear all tickets for this table"
+            className="rounded-lg bg-white/10 hover:bg-red-500/30 hover:text-red-200 px-2 py-1 text-[11px] font-bold text-white/70 transition-colors"
+          >
+            ✕ Clear
+          </button>
+        </div>
       </div>
 
       {/* Tickets */}
@@ -140,51 +153,52 @@ export default function TableOrderCard({ tableNum, orders }: TableOrderCardProps
               })}
             </div>
 
-            {/* Ticket Actions */}
-            {order.status !== 'ready' && (
-              <div className="mt-2.5 flex items-center justify-end gap-2 border-t border-white/10 pt-2">
+            {/* Ticket Actions (Always available for deleting test / canceled tickets) */}
+            <div className="mt-2.5 flex items-center justify-end gap-2 border-t border-white/10 pt-2">
+              <button
+                onClick={() => printKot(tableNum, order)}
+                title="Print Kitchen Ticket"
+                className="rounded-xl border border-white/20 bg-white/10 px-2.5 py-1 text-xs text-white hover:bg-white/20 transition-colors"
+              >
+                🖨️ KOT
+              </button>
+
+              <button
+                onClick={() => {
+                  if (window.confirm(`Delete Ticket #${order.id.slice(-6)}?`)) {
+                    cancelOrder(tableNum, order.id);
+                  }
+                }}
+                title="Delete or cancel this order"
+                className="rounded-xl border border-red-500/40 bg-red-500/20 px-2.5 py-1 text-xs font-bold text-red-300 hover:bg-red-500/30 transition-colors"
+              >
+                🗑️ Delete
+              </button>
+
+              {order.status === 'pending' && (
                 <button
-                  onClick={() => printKot(tableNum, order)}
-                  title="Print Kitchen Ticket"
-                  className="rounded-xl border border-white/20 bg-white/10 px-2.5 py-1 text-xs text-white hover:bg-white/20 transition-colors"
+                  onClick={() => updateOrderStatus(tableNum, order.id, 'preparing')}
+                  className="rounded-xl bg-orange-500 px-3 py-1 text-xs font-black text-white hover:bg-orange-600 transition-colors shadow-sm flex items-center gap-1"
                 >
-                  🖨️ KOT
+                  <span>👨‍🍳</span> Prepare
                 </button>
+              )}
 
-                {order.status === 'pending' && (
-                  <>
-                    <button
-                      onClick={() => cancelOrder(tableNum, order.id)}
-                      title="Decline/Reject fake or unwanted order"
-                      className="rounded-xl border border-red-500/40 bg-red-500/20 px-2.5 py-1.5 text-xs font-bold text-red-300 hover:bg-red-500/30 transition-colors"
-                    >
-                      ❌ Reject
-                    </button>
-                    <button
-                      onClick={() => updateOrderStatus(tableNum, order.id, 'preparing')}
-                      className="rounded-xl bg-orange-500 px-3 py-1.5 text-xs font-black text-white hover:bg-orange-600 transition-colors shadow-sm flex items-center gap-1"
-                    >
-                      <span>👨‍🍳</span> Start Preparing
-                    </button>
-                  </>
-                )}
-
-                {order.status === 'preparing' && (
-                  <button
-                    onClick={() => updateOrderStatus(tableNum, order.id, 'ready')}
-                    className="rounded-xl bg-accent-green px-3 py-1.5 text-xs font-black text-white hover:bg-accent-green/90 transition-colors shadow-sm flex items-center gap-1"
-                  >
-                    <span>✅</span> Ready
-                  </button>
-                )}
-              </div>
-            )}
+              {order.status === 'preparing' && (
+                <button
+                  onClick={() => updateOrderStatus(tableNum, order.id, 'ready')}
+                  className="rounded-xl bg-accent-green px-3 py-1 text-xs font-black text-white hover:bg-accent-green/90 transition-colors shadow-sm flex items-center gap-1"
+                >
+                  <span>✅</span> Ready
+                </button>
+              )}
+            </div>
           </div>
         ))}
       </div>
 
       {/* Footer action */}
-      <div className="mt-4">
+      <div className="mt-4 space-y-2">
         {hasUnprepared ? (
           <button
             onClick={handleMarkAllReady}
@@ -198,6 +212,18 @@ export default function TableOrderCard({ tableNum, orders }: TableOrderCardProps
             <p className="font-georgia text-xs font-bold text-accent-green">All Tickets Served</p>
           </div>
         )}
+
+        <button
+          onClick={() => {
+            if (window.confirm(`Clear all orders for Table ${tableNum}? (Table finished / bill paid)`)) {
+              clearTableOrders(tableNum);
+            }
+          }}
+          className="flex w-full items-center justify-center gap-1.5 rounded-2xl border border-white/10 bg-white/5 py-2 text-xs font-bold text-white/70 hover:bg-red-500/20 hover:text-red-300 hover:border-red-500/40 transition-colors"
+        >
+          <span>🧹</span>
+          <span>Clear Table (Paid / Reset)</span>
+        </button>
       </div>
 
       {toastVisible && (

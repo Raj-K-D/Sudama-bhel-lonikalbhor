@@ -49,7 +49,7 @@ export function getRestaurantLocation(): { lat: number; lng: number; radiusMeter
       lat: DEFAULT_RESTAURANT_LAT,
       lng: DEFAULT_RESTAURANT_LNG,
       radiusMeters: DEFAULT_GEOFENCE_RADIUS_METERS,
-      enabled: true,
+      enabled: false,
     };
   }
 
@@ -62,15 +62,15 @@ export function getRestaurantLocation(): { lat: number; lng: number; radiusMeter
     lat: storedLat ? parseFloat(storedLat) : DEFAULT_RESTAURANT_LAT,
     lng: storedLng ? parseFloat(storedLng) : DEFAULT_RESTAURANT_LNG,
     radiusMeters: storedRadius ? parseInt(storedRadius, 10) : DEFAULT_GEOFENCE_RADIUS_METERS,
-    // By default enabled unless explicitly turned off
-    enabled: storedEnabled !== 'false',
+    // By default DISABLED for easy testing/demo. Can be enabled in Admin.
+    enabled: storedEnabled === 'true',
   };
 }
 
 /**
  * Saves restaurant coordinates (e.g. when owner clicks "Set current location as restaurant location").
  */
-export function saveRestaurantLocation(lat: number, lng: number, radiusMeters = 200, enabled = true): void {
+export function saveRestaurantLocation(lat: number, lng: number, radiusMeters = DEFAULT_GEOFENCE_RADIUS_METERS, enabled = true): void {
   if (typeof window === 'undefined') return;
   localStorage.setItem('sudama_restaurant_lat', lat.toString());
   localStorage.setItem('sudama_restaurant_lng', lng.toString());
@@ -112,7 +112,7 @@ export async function verifyCustomerAtRestaurant(): Promise<LocationVerification
             allowed: false,
             distanceMeters: distance,
             reason: 'OUT_OF_RANGE',
-            message: `You appear to be ${displayKm} km away from Sudama Bhel. To prevent prank orders, dining orders can only be placed while seated at the restaurant.`,
+            message: `You appear to be ${displayKm} km away from Sudama Bhel (Loni Kalbhor). If you are testing or sitting at a table, you can tap "Place Order Anyway" below.`,
           });
         }
       },
