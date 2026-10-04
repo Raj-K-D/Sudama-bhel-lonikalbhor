@@ -14,7 +14,6 @@ export default function QrCard() {
 
   const [selectedTable, setSelectedTable] = useState(1);
   const [origin, setOrigin] = useState(BASE_URL);
-  const [viewAll, setViewAll] = useState(false);
   const [theme, setTheme] = useState<StandeeTheme>('red-gold');
   const [notification, setNotification] = useState<string | null>(null);
   const [isExporting, setIsExporting] = useState(false);
@@ -55,7 +54,17 @@ export default function QrCard() {
     window.print();
   };
 
-  // ── Render High-Resolution 1200x1600 Standee on Offscreen Canvas ────────────
+  // Group tables into chunks of 4 (for 4 per A4 page)
+  const tablePages: number[][] = [];
+  for (let i = 1; i <= tableCount; i += 4) {
+    const page: number[] = [];
+    for (let j = i; j < i + 4 && j <= tableCount; j++) {
+      page.push(j);
+    }
+    tablePages.push(page);
+  }
+
+  // ── Render High-Resolution 1200x1600 Standee on Offscreen Canvas (English & Centered) ──
   const generateStandeeCanvas = async (tableNum: number, currentTheme: StandeeTheme): Promise<HTMLCanvasElement> => {
     const canvas = document.createElement('canvas');
     canvas.width = 1200;
@@ -125,25 +134,25 @@ export default function QrCard() {
     ctx.strokeStyle = colors.accentGold;
     ctx.strokeRect(36, 36, 1128, 1528);
 
-    // 3. Header Section (Curved Bottom)
+    // 3. Header Section
     ctx.fillStyle = colors.headerBg;
     ctx.beginPath();
     ctx.roundRect(40, 40, 1120, 270, [24, 24, 40, 40]);
     ctx.fill();
 
-    // Marathi Brand Title
+    // English Brand Title
     ctx.fillStyle = colors.subHeaderText;
-    ctx.font = 'bold 36px "Segoe UI", Roboto, "Noto Sans Devanagari", sans-serif';
+    ctx.font = 'bold 34px "Segoe UI", Roboto, sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText('⭐ पुण्याचे सुप्रसिद्ध ⭐', 600, 105);
+    ctx.fillText('⭐ PUNE\'S FAMOUS ⭐', 600, 105);
 
     ctx.fillStyle = colors.headerText;
-    ctx.font = '900 58px "Segoe UI", Roboto, "Noto Sans Devanagari", sans-serif';
-    ctx.fillText('सुदामा भेळ ॲन्ड स्नॅक्स', 600, 180);
+    ctx.font = '900 64px "Georgia", serif, sans-serif';
+    ctx.fillText('SUDAMA BHEL & SNACKS', 600, 185);
 
     ctx.fillStyle = colors.subHeaderText;
     ctx.font = 'bold 30px "Segoe UI", Roboto, sans-serif';
-    ctx.fillText('SUDAMA BHEL • LONI KALBHOR, PUNE', 600, 245);
+    ctx.fillText('LONI KALBHOR • PUNE', 600, 248);
 
     // 4. Catchy Value Proposition Banner
     ctx.fillStyle = '#FEF08A';
@@ -155,8 +164,8 @@ export default function QrCard() {
     ctx.stroke();
 
     ctx.fillStyle = '#78350F';
-    ctx.font = '900 32px "Segoe UI", Roboto, "Noto Sans Devanagari", sans-serif';
-    ctx.fillText('⚡ रांगेत थांबू नका! थेट टेबलवरून ऑर्डर करा ⚡', 600, 386);
+    ctx.font = '900 32px "Segoe UI", Roboto, sans-serif';
+    ctx.fillText('⚡ SKIP THE LINE • SCAN & ORDER AT TABLE ⚡', 600, 386);
 
     // 5. Large TABLE Banner
     ctx.fillStyle = colors.tableBg;
@@ -171,43 +180,37 @@ export default function QrCard() {
     ctx.font = '900 56px "Georgia", serif, sans-serif';
     ctx.fillText(`TABLE ${tableNum < 10 ? '0' + tableNum : tableNum}`, 600, 510);
 
-    // 6. Center QR Code Container
+    // 6. Center QR Code Container (PERFECTLY CENTERED)
     ctx.fillStyle = '#FFFFFF';
     ctx.beginPath();
-    ctx.roundRect(300, 565, 600, 600, 36);
+    ctx.roundRect(300, 570, 600, 640, 36);
     ctx.fill();
     ctx.strokeStyle = '#E5E7EB';
     ctx.lineWidth = 6;
     ctx.stroke();
 
-    // Draw QR Code from hidden pre-rendered canvas
+    // Draw QR Code from hidden pre-rendered canvas right in the middle
     const existingCanvas = document.getElementById(`qr-canvas-hidden-${tableNum}`) as HTMLCanvasElement | null;
     if (existingCanvas) {
-      ctx.drawImage(existingCanvas, 360, 625, 480, 480);
+      ctx.drawImage(existingCanvas, 340, 620, 520, 520);
     } else {
-      // Fallback
-      ctx.fillStyle = '#FFFFFF';
-      ctx.fillRect(360, 625, 480, 480);
+      ctx.fillStyle = '#111827';
+      ctx.fillRect(340, 620, 520, 520);
     }
 
-    // Scan CTA under QR
-    ctx.fillStyle = colors.accentGold;
-    ctx.font = '900 32px "Segoe UI", Roboto, "Noto Sans Devanagari", sans-serif';
-    ctx.fillText('📲 SCAN WITH CAMERA / GPAY / PHONEPE', 600, 1205);
-
-    // 7. 3-Step Simple Guide Section
+    // 7. 3-Step Simple Guide Section (English)
     ctx.fillStyle = colors.stepBg;
     ctx.beginPath();
-    ctx.roundRect(80, 1240, 1040, 180, 24);
+    ctx.roundRect(80, 1250, 1040, 170, 24);
     ctx.fill();
     ctx.strokeStyle = colors.stepBorder;
     ctx.lineWidth = 3;
     ctx.stroke();
 
     const steps = [
-      { num: '१', title: 'कॅमेरा उघडा', desc: 'Scan QR with Camera' },
-      { num: '२', title: 'मेनू निवडा', desc: 'Add Items & Order' },
-      { num: '३', title: 'टेबलवर जेवा', desc: 'Served at Your Table' },
+      { num: '1', title: 'Scan QR Code', desc: 'Use Camera / GPay' },
+      { num: '2', title: 'Pick Your Items', desc: 'Add Snacks & Cart' },
+      { num: '3', title: 'Enjoy at Table', desc: 'Fast Table Service' },
     ];
 
     steps.forEach((st, idx) => {
@@ -215,33 +218,33 @@ export default function QrCard() {
       // Step badge
       ctx.fillStyle = colors.tableBg;
       ctx.beginPath();
-      ctx.arc(x - 90, 1330, 32, 0, Math.PI * 2);
+      ctx.arc(x - 90, 1335, 32, 0, Math.PI * 2);
       ctx.fill();
 
       ctx.fillStyle = colors.tableText;
       ctx.font = '900 28px "Segoe UI", sans-serif';
-      ctx.fillText(st.num, x - 90, 1340);
+      ctx.fillText(st.num, x - 90, 1345);
 
       // Step text
       ctx.fillStyle = colors.stepText;
       ctx.textAlign = 'left';
-      ctx.font = '900 26px "Segoe UI", Roboto, "Noto Sans Devanagari", sans-serif';
-      ctx.fillText(st.title, x - 45, 1320);
+      ctx.font = '900 26px "Segoe UI", Roboto, sans-serif';
+      ctx.fillText(st.title, x - 45, 1325);
       ctx.font = 'bold 20px "Segoe UI", Roboto, sans-serif';
       ctx.fillStyle = '#6B7280';
-      ctx.fillText(st.desc, x - 45, 1350);
+      ctx.fillText(st.desc, x - 45, 1355);
       ctx.textAlign = 'center';
     });
 
     // 8. Footer Trust Badges
     ctx.fillStyle = colors.footerBg;
     ctx.beginPath();
-    ctx.roundRect(60, 1445, 1080, 95, 20);
+    ctx.roundRect(60, 1450, 1080, 90, 20);
     ctx.fill();
 
     ctx.fillStyle = colors.footerText;
     ctx.font = 'bold 24px "Segoe UI", Roboto, sans-serif';
-    ctx.fillText('✨ No App Download Required • 100% Free & Contactless • Pay via UPI or Cash', 600, 1502);
+    ctx.fillText('✨ No App Required • Contactless Menu • Pay via UPI or Cash', 600, 1505);
 
     return canvas;
   };
@@ -249,18 +252,18 @@ export default function QrCard() {
   // ── Download Single Table Standee (PNG) ──────────────────────────────────────
   const handleDownloadSingle = async (tableNum: number) => {
     try {
-      setNotification(`⏳ Generating Table ${tableNum} Standee HD Image...`);
+      setNotification(`⏳ Generating Table ${tableNum} HD Image...`);
       const canvas = await generateStandeeCanvas(tableNum, theme);
       const dataUrl = canvas.toDataURL('image/png', 1.0);
       const link = document.createElement('a');
-      link.download = `Sudama-Bhel-Table-${tableNum < 10 ? '0' + tableNum : tableNum}-Standee.png`;
+      link.download = `Sudama-Bhel-Table-${tableNum < 10 ? '0' + tableNum : tableNum}-Sticker.png`;
       link.href = dataUrl;
       link.click();
-      setNotification(`✅ Table ${tableNum} Standee downloaded successfully!`);
+      setNotification(`✅ Table ${tableNum} sticker downloaded successfully!`);
       setTimeout(() => setNotification(null), 3500);
     } catch (err) {
       console.error(err);
-      setNotification('❌ Failed to export standee.');
+      setNotification('❌ Failed to export image.');
     }
   };
 
@@ -269,31 +272,31 @@ export default function QrCard() {
     try {
       setIsExporting(true);
       setExportProgress(0);
-      setNotification(`⏳ Preparing ZIP package for all ${tableCount} tables...`);
+      setNotification(`⏳ Generating all ${tableCount} table stickers in ZIP...`);
 
       const zip = new JSZip();
-      const folder = zip.folder('Sudama-Bhel-Table-Standees');
+      const folder = zip.folder('Sudama-Bhel-Table-Stickers');
 
       for (let i = 1; i <= tableCount; i++) {
         setExportProgress(Math.round((i / tableCount) * 100));
         const canvas = await generateStandeeCanvas(i, theme);
         const dataUrl = canvas.toDataURL('image/png', 1.0);
         const base64Data = dataUrl.replace(/^data:image\/png;base64,/, '');
-        const filename = `Table-${i < 10 ? '0' + i : i}-Standee.png`;
+        const filename = `Table-${i < 10 ? '0' + i : i}-Sticker.png`;
         folder?.file(filename, base64Data, { base64: true });
       }
 
-      setNotification('📦 Generating ZIP archive file...');
+      setNotification('📦 Packaging ZIP file...');
       const content = await zip.generateAsync({ type: 'blob' });
       const url = URL.createObjectURL(content);
       const link = document.createElement('a');
       link.href = url;
-      link.download = `Sudama-Bhel-All-${tableCount}-Table-Standees.zip`;
+      link.download = `Sudama-Bhel-All-${tableCount}-Table-Stickers.zip`;
       link.click();
       URL.revokeObjectURL(url);
 
       setIsExporting(false);
-      setNotification(`🎉 All ${tableCount} table standees downloaded in ZIP file!`);
+      setNotification(`🎉 All ${tableCount} stickers downloaded in ZIP!`);
       setTimeout(() => setNotification(null), 4000);
     } catch (err) {
       console.error(err);
@@ -311,7 +314,7 @@ export default function QrCard() {
             key={n}
             id={`qr-canvas-hidden-${n}`}
             value={`${origin}/?table=${n}`}
-            size={480}
+            size={520}
             level="H"
             includeMargin={true}
           />
@@ -322,11 +325,11 @@ export default function QrCard() {
       <div className="print:hidden flex flex-wrap items-center justify-between gap-3 rounded-3xl border border-white/10 bg-white/5 p-4 sm:p-5 shadow-lg">
         <div>
           <h2 className="font-georgia text-lg font-bold text-white flex items-center gap-2">
-            <span>🪑</span> Restaurant QR Standees & Table Manager
+            <span>🪑</span> Restaurant Table Stickers (4 per A4 Page)
           </h2>
           <p className="text-xs text-white/60">
-            Currently configured: <strong className="text-primary">{tableCount} Seating Tables</strong>.
-            Export high-definition acrylic standees that entice customers to scan and order.
+            Currently configured: <strong className="text-primary">{tableCount} Tables</strong> ({tablePages.length} A4 Pages).
+            Formatted to print 4 stickers per sheet with scissor cutting guides.
           </p>
         </div>
 
@@ -374,7 +377,7 @@ export default function QrCard() {
       <div className="print:hidden flex flex-wrap items-center justify-between gap-3 rounded-3xl border border-white/10 bg-white/5 p-4">
         {/* Design Theme Selector */}
         <div className="flex items-center gap-2">
-          <span className="text-xs font-bold text-white/60">Design Style:</span>
+          <span className="text-xs font-bold text-white/60">Color Style:</span>
           <button
             onClick={() => setTheme('red-gold')}
             className={`flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-bold transition-all ${
@@ -383,7 +386,7 @@ export default function QrCard() {
                 : 'bg-white/10 text-white/80 hover:bg-white/20'
             }`}
           >
-            <span>🔴</span> Sudama Red & Gold
+            <span>🔴</span> Red & Gold
           </button>
           <button
             onClick={() => setTheme('royal-dark')}
@@ -393,7 +396,7 @@ export default function QrCard() {
                 : 'bg-white/10 text-white/80 hover:bg-white/20'
             }`}
           >
-            <span>⬛</span> Royal Dark Velvet
+            <span>⬛</span> Royal Dark
           </button>
           <button
             onClick={() => setTheme('emerald')}
@@ -403,7 +406,7 @@ export default function QrCard() {
                 : 'bg-white/10 text-white/80 hover:bg-white/20'
             }`}
           >
-            <span>🟢</span> Fresh Mint
+            <span>🟢</span> Emerald Green
           </button>
         </div>
 
@@ -415,126 +418,71 @@ export default function QrCard() {
             className="flex items-center gap-1.5 rounded-2xl bg-accent-gold px-4 py-2 font-georgia text-xs font-black text-black shadow-premium hover:bg-accent-gold/90 transition-all active:scale-95 disabled:opacity-50"
           >
             <span>📦</span>
-            <span>Download All {tableCount} Standees (.ZIP)</span>
+            <span>Download All {tableCount} Images (.ZIP)</span>
           </button>
 
           <button
             onClick={handlePrint}
-            className="flex items-center gap-1.5 rounded-2xl bg-white/15 hover:bg-white/25 px-4 py-2 text-xs font-bold text-white transition-all active:scale-95"
+            className="flex items-center gap-1.5 rounded-2xl bg-primary px-4 py-2 font-georgia text-xs font-black text-black shadow-premium hover:bg-primary/90 transition-all active:scale-95"
           >
             <span>🖨️</span>
-            <span>Print All (A6 / Acrylic)</span>
+            <span>Print All {tableCount} (4 per A4 Page)</span>
           </button>
         </div>
       </div>
 
-      {/* ── View Mode Switcher ────────────────────────────────────────────── */}
-      <div className="print:hidden flex items-center justify-between border-b border-white/10 pb-2">
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => setViewAll(false)}
-            className={`rounded-xl px-4 py-1.5 text-xs font-bold transition-colors ${
-              !viewAll ? 'bg-primary text-black' : 'bg-white/10 text-white hover:bg-white/20'
-            }`}
-          >
-            Single Standee Preview
-          </button>
-          <button
-            onClick={() => setViewAll(true)}
-            className={`rounded-xl px-4 py-1.5 text-xs font-bold transition-colors ${
-              viewAll ? 'bg-primary text-black' : 'bg-white/10 text-white hover:bg-white/20'
-            }`}
-          >
-            📄 View All {tableCount} Tables (Print Sheet)
-          </button>
-        </div>
-
-        {!viewAll && (
-          <button
-            onClick={() => handleDownloadSingle(selectedTable)}
-            className="flex items-center gap-1.5 rounded-xl bg-primary/20 border border-primary/50 text-primary px-3 py-1 text-xs font-bold hover:bg-primary hover:text-black transition-colors"
-          >
-            <span>📥</span> Download Table {selectedTable} (HD PNG)
-          </button>
-        )}
+      {/* ── PRINT NOTICE (Screen Only) ─────────────────────────────────────── */}
+      <div className="print:hidden rounded-2xl border border-white/10 bg-black/40 p-3 text-center text-xs text-white/70">
+        📄 <strong>A4 Print Layout:</strong> Exactly <strong>4 Table Stickers per Page</strong> with dashed cutting borders ✂️.
+        Print on A4 sticker paper or cardstock to cut and stick directly on tables.
       </div>
 
-      {/* ── SINGLE TABLE VIEW ──────────────────────────────────────────────── */}
-      {!viewAll ? (
-        <div className="space-y-6">
-          {/* Table selector pill buttons */}
-          <div className="print:hidden">
-            <p className="text-xs text-white/60 mb-2">Select table number to preview & download:</p>
-            <div className="flex flex-wrap gap-2">
-              {Array.from({ length: tableCount }, (_, i) => i + 1).map((n) => (
-                <button
-                  key={n}
-                  onClick={() => setSelectedTable(n)}
-                  className={`flex h-11 w-11 items-center justify-center rounded-2xl border font-bold text-base transition-all active:scale-95 ${
-                    n === selectedTable
-                      ? 'border-primary bg-primary text-black shadow-lg scale-105'
-                      : 'border-white/20 bg-white/10 text-white hover:bg-white/20'
-                  }`}
-                >
-                  {n}
-                </button>
+      {/* ── 4-PER-PAGE A4 PRINT SHEETS CONTAINER ───────────────────────────── */}
+      <div className="space-y-12 print:space-y-0">
+        {tablePages.map((pageTables, pageIndex) => (
+          <div
+            key={pageIndex}
+            className="rounded-3xl bg-neutral-900/60 p-4 sm:p-6 border border-white/10 print:border-none print:p-0 print:m-0 print:bg-white print:break-after-page print:page-break-after-always"
+          >
+            {/* Screen Page Header (Hidden on Print) */}
+            <div className="print:hidden flex items-center justify-between mb-4 pb-2 border-b border-white/10">
+              <span className="font-georgia text-sm font-bold text-white">
+                📄 Sheet {pageIndex + 1} of {tablePages.length} — Tables {pageTables[0]} to {pageTables[pageTables.length - 1]}
+              </span>
+              <span className="text-xs text-white/50">4 stickers / A4 sheet</span>
+            </div>
+
+            {/* 2x2 Grid per A4 Page */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 print:grid-cols-2 print:gap-4 print:w-full print:h-full">
+              {pageTables.map((n) => (
+                <div key={n} className="flex justify-center">
+                  <TableStickerCard
+                    tableNum={n}
+                    origin={origin}
+                    theme={theme}
+                    onDownload={() => handleDownloadSingle(n)}
+                  />
+                </div>
               ))}
             </div>
           </div>
-
-          {/* Standee Preview Card */}
-          <div className="flex justify-center">
-            <AttractiveTableStandee
-              tableNum={selectedTable}
-              origin={origin}
-              theme={theme}
-              onDownload={() => handleDownloadSingle(selectedTable)}
-            />
-          </div>
-
-          <p className="print:hidden text-center text-xs text-white/50">
-            💡 <strong>Pro-Tip:</strong> Print on 300 GSM photo paper and insert into 4&quot;x6&quot; acrylic T-stand / L-stands for maximum customer scanning.
-          </p>
-        </div>
-      ) : (
-        /* ── ALL TABLES GRID (BATCH PRINT VIEW) ────────────────────────────── */
-        <div className="space-y-4">
-          <p className="print:hidden text-xs text-white/60">
-            Showing all {tableCount} table standees formatted for printing. Click <strong>&ldquo;🖨️ Print All&rdquo;</strong> to print directly or <strong>&ldquo;📦 Download All Standees (.ZIP)&rdquo;</strong> to save all HD images.
-          </p>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 print:grid-cols-2 print:gap-6">
-            {Array.from({ length: tableCount }, (_, i) => i + 1).map((n) => (
-              <div key={n} className="flex justify-center break-inside-avoid print:mb-8">
-                <AttractiveTableStandee
-                  tableNum={n}
-                  origin={origin}
-                  theme={theme}
-                  onDownload={() => handleDownloadSingle(n)}
-                  compact
-                />
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+        ))}
+      </div>
     </div>
   );
 }
 
-// ── Ultra-Attractive High-Converting Table Standee Component ─────────────────
-function AttractiveTableStandee({
+// ── Ultra-Clean Table Sticker Card (4 Per Page with Cutting Guides) ──────────
+function TableStickerCard({
   tableNum,
   origin,
   theme,
   onDownload,
-  compact = false,
 }: {
   tableNum: number;
   origin: string;
   theme: StandeeTheme;
   onDownload?: () => void;
-  compact?: boolean;
 }) {
   const qrData = `${origin}/?table=${tableNum}`;
 
@@ -575,112 +523,113 @@ function AttractiveTableStandee({
   }[theme];
 
   return (
-    <div
-      className={`relative flex flex-col items-center rounded-[32px] ${themeStyles.cardBg} ${
-        compact ? 'w-[320px] p-5' : 'w-full max-w-[380px] p-6'
-      } border-[6px] ${themeStyles.border} shadow-2xl text-center select-none overflow-hidden transition-all`}
-    >
-      {/* Top Header Card */}
-      <div className={`w-full rounded-2xl ${themeStyles.headerBg} py-4 px-3 shadow-md`}>
-        <p className={`text-xs font-black tracking-widest uppercase ${themeStyles.headerTitle}`}>
-          ⭐ पुण्याचे सुप्रसिद्ध ⭐
-        </p>
-        <h1 className={`mt-0.5 font-georgia text-2xl font-black tracking-wide ${themeStyles.headerSub}`}>
-          सुदामा भेळ ॲन्ड स्नॅक्स
-        </h1>
-        <p className="mt-0.5 text-[11px] font-bold text-amber-300/90 tracking-wider uppercase">
-          SUDAMA BHEL • LONI KALBHOR
-        </p>
-      </div>
+    <div className="relative p-2 border-2 border-dashed border-gray-400/80 rounded-3xl w-full max-w-[340px] print:max-w-none print:w-full print:border-dashed print:border-gray-400 print:p-2.5">
+      {/* Cut scissors indicator */}
+      <span className="absolute -top-3 left-6 bg-white px-1 text-[10px] font-bold text-gray-500 print:text-black">
+        ✂️ Cut along dashed line
+      </span>
 
-      {/* Catchy Value Banner */}
-      <div className="mt-3 w-full rounded-xl bg-amber-100 border border-amber-300 py-1.5 px-2">
-        <p className="text-xs font-black text-amber-950 flex items-center justify-center gap-1">
-          <span>⚡</span>
-          <span>रांगेत थांबू नका! थेट टेबलवरून ऑर्डर करा</span>
-          <span>⚡</span>
-        </p>
-      </div>
-
-      {/* Prominent Table Badge */}
+      {/* Main Sticker Body */}
       <div
-        className={`mt-3 w-full rounded-2xl py-2 px-4 shadow-md border-2 ${themeStyles.tableBanner}`}
+        className={`flex flex-col items-center justify-between rounded-2xl ${themeStyles.cardBg} p-4 border-4 ${themeStyles.border} shadow-lg text-center select-none overflow-hidden h-full min-h-[460px] print:min-h-[480px]`}
       >
-        <p className="font-georgia text-xl font-black tracking-[4px]">
-          TABLE {tableNum < 10 ? '0' + tableNum : tableNum}
-        </p>
-      </div>
-
-      {/* High-Contrast QR Code Frame */}
-      <div className="mt-3 relative rounded-3xl bg-white p-4 shadow-inner border-2 border-gray-200">
-        <QRCodeSVG
-          value={qrData}
-          size={compact ? 180 : 210}
-          bgColor="#ffffff"
-          fgColor="#111827"
-          level="H"
-          includeMargin={false}
-        />
-        <div className="mt-2 flex items-center justify-center gap-1 text-[11px] font-black text-amber-700">
-          <span>📲</span>
-          <span>SCAN WITH ANY CAMERA / GPAY / PHONEPE</span>
+        {/* Top Header Card */}
+        <div className={`w-full rounded-xl ${themeStyles.headerBg} py-2.5 px-2 shadow-sm`}>
+          <p className={`text-[10px] font-black tracking-widest uppercase ${themeStyles.headerTitle}`}>
+            ⭐ PUNE&apos;S FAMOUS ⭐
+          </p>
+          <h1 className={`font-georgia text-lg sm:text-xl font-black tracking-wide ${themeStyles.headerSub} leading-tight`}>
+            SUDAMA BHEL &amp; SNACKS
+          </h1>
+          <p className="text-[9px] font-bold text-amber-300/90 tracking-wider uppercase">
+            LONI KALBHOR • PUNE
+          </p>
         </div>
-      </div>
 
-      {/* 3-Step Simple How It Works */}
-      <div className={`mt-3 w-full rounded-2xl border ${themeStyles.stepBox} p-2.5 space-y-1.5`}>
-        <div className="grid grid-cols-3 gap-1.5 text-left">
-          <div className="flex items-center gap-1.5">
-            <span className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px] font-black ${themeStyles.stepBadge}`}>
-              १
-            </span>
-            <div>
-              <p className="text-[10px] font-black leading-tight">स्कॅन करा</p>
-              <p className="text-[8px] opacity-75">Scan QR</p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-1.5">
-            <span className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px] font-black ${themeStyles.stepBadge}`}>
-              २
-            </span>
-            <div>
-              <p className="text-[10px] font-black leading-tight">मेनू निवडा</p>
-              <p className="text-[8px] opacity-75">Pick Items</p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-1.5">
-            <span className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px] font-black ${themeStyles.stepBadge}`}>
-              ३
-            </span>
-            <div>
-              <p className="text-[10px] font-black leading-tight">टेबलवर जेवा</p>
-              <p className="text-[8px] opacity-75">Fast Delivery</p>
-            </div>
-          </div>
+        {/* Catchy Value Banner */}
+        <div className="mt-2 w-full rounded-lg bg-amber-100 border border-amber-300 py-1 px-2">
+          <p className="text-[10px] font-black text-amber-950 flex items-center justify-center gap-1">
+            <span>⚡</span>
+            <span>SKIP THE LINE • SCAN &amp; ORDER AT TABLE</span>
+            <span>⚡</span>
+          </p>
         </div>
-      </div>
 
-      {/* Footer Trust Badges */}
-      <div className={`mt-3 w-full rounded-xl ${themeStyles.footerBg} py-2 px-3 text-[10px] font-bold`}>
-        <p className="leading-tight">
-          ✨ No App Required • 100% Free & Contactless
-        </p>
-        <p className="text-[9px] opacity-80 mt-0.5">
-          Pay via UPI (GPay/PhonePe/Paytm) or Cash at Counter
-        </p>
-      </div>
-
-      {/* Download Action (Hidden on Print) */}
-      {onDownload && (
-        <button
-          onClick={onDownload}
-          className="print:hidden mt-3 flex w-full items-center justify-center gap-1.5 rounded-xl bg-gray-900/10 hover:bg-gray-900/20 py-2 text-xs font-bold text-gray-800 transition-colors"
+        {/* Prominent Table Badge */}
+        <div
+          className={`mt-2 w-full rounded-xl py-1.5 px-3 shadow-sm border-2 ${themeStyles.tableBanner}`}
         >
-          <span>📥</span> Download Table {tableNum} HD PNG
-        </button>
-      )}
+          <p className="font-georgia text-base sm:text-lg font-black tracking-[3px]">
+            TABLE {tableNum < 10 ? '0' + tableNum : tableNum}
+          </p>
+        </div>
+
+        {/* High-Contrast QR Code Container — DEAD CENTER, NO TEXT BELOW */}
+        <div className="my-auto py-2 flex flex-col items-center justify-center w-full">
+          <div className="rounded-2xl bg-white p-3 shadow-inner border border-gray-200 inline-block">
+            <QRCodeSVG
+              value={qrData}
+              size={175}
+              bgColor="#ffffff"
+              fgColor="#111827"
+              level="H"
+              includeMargin={false}
+            />
+          </div>
+        </div>
+
+        {/* 3-Step Simple Guide (English) */}
+        <div className={`w-full rounded-xl border ${themeStyles.stepBox} p-2`}>
+          <div className="grid grid-cols-3 gap-1 text-left">
+            <div className="flex items-center gap-1">
+              <span className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full text-[9px] font-black ${themeStyles.stepBadge}`}>
+                1
+              </span>
+              <div>
+                <p className="text-[9px] font-black leading-tight">Scan QR</p>
+                <p className="text-[7px] opacity-75">Camera/App</p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-1">
+              <span className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full text-[9px] font-black ${themeStyles.stepBadge}`}>
+                2
+              </span>
+              <div>
+                <p className="text-[9px] font-black leading-tight">Pick Food</p>
+                <p className="text-[7px] opacity-75">Select Items</p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-1">
+              <span className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full text-[9px] font-black ${themeStyles.stepBadge}`}>
+                3
+              </span>
+              <div>
+                <p className="text-[9px] font-black leading-tight">Served</p>
+                <p className="text-[7px] opacity-75">At Table</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Footer Trust Badges */}
+        <div className={`mt-2 w-full rounded-lg ${themeStyles.footerBg} py-1.5 px-2 text-[9px] font-bold`}>
+          <p className="leading-tight">
+            ✨ No App Needed • Contactless Menu • Pay via UPI / Cash
+          </p>
+        </div>
+
+        {/* Download Action (Hidden on Print) */}
+        {onDownload && (
+          <button
+            onClick={onDownload}
+            className="print:hidden mt-2 flex w-full items-center justify-center gap-1 rounded-lg bg-gray-900/10 hover:bg-gray-900/20 py-1.5 text-[11px] font-bold text-gray-800 transition-colors"
+          >
+            <span>📥</span> Download Table {tableNum} PNG
+          </button>
+        )}
+      </div>
     </div>
   );
 }
