@@ -111,17 +111,17 @@ async function generateAll() {
 
     /* ── A4 Page Container ─────────────────────────────────────────────── */
     .a4-page {
-      width: 194mm;
-      min-height: 281mm;
-      height: 281mm;
-      max-height: 281mm;
+      width: 198mm;
+      min-height: 285mm;
+      height: 285mm;
+      max-height: 285mm;
       margin: 0 auto 30px;
       background: #ffffff;
-      padding: 4mm;
+      padding: 2mm;
       display: grid;
       grid-template-columns: 1fr 1fr;
       grid-template-rows: 1fr 1fr;
-      gap: 5mm;
+      gap: 4mm;
       box-shadow: 0 8px 30px rgba(0,0,0,0.12);
       border-radius: 8px;
       page-break-after: always;
@@ -133,7 +133,7 @@ async function generateAll() {
     .sticker-container {
       border: 2px dashed #9ca3af;
       border-radius: 20px;
-      padding: 6px;
+      padding: 5px;
       position: relative;
       display: flex;
       flex-direction: column;
@@ -162,7 +162,7 @@ async function generateAll() {
       flex-direction: column;
       align-items: center;
       justify-content: space-between;
-      padding: 8px 10px;
+      padding: 6px 8px;
       text-align: center;
       box-shadow: inset 0 0 0 1px #fef08a;
     }
@@ -172,7 +172,7 @@ async function generateAll() {
       background: linear-gradient(180deg, #b91c1c 0%, #dc2626 100%);
       width: 100%;
       border-radius: 10px;
-      padding: 5px 4px;
+      padding: 4px 6px;
       color: #ffffff;
       box-shadow: 0 2px 6px rgba(185, 28, 28, 0.3);
     }
@@ -181,7 +181,7 @@ async function generateAll() {
       font-size: 8px;
       font-weight: 800;
       color: #fef08a;
-      letter-spacing: 1.5px;
+      letter-spacing: 1px;
       text-transform: uppercase;
     }
 
@@ -199,20 +199,7 @@ async function generateAll() {
       font-size: 7.5px;
       font-weight: 800;
       color: #fde047;
-      letter-spacing: 1px;
-    }
-
-    /* Tagline */
-    .tagline {
-      background: #fef9c3;
-      border: 1px solid #facc15;
-      width: 100%;
-      border-radius: 6px;
-      padding: 2.5px 2px;
-      font-size: 8px;
-      font-weight: 900;
-      color: #78350f;
-      margin: 3px 0 2px;
+      letter-spacing: 0.8px;
     }
 
     /* Table Banner */
@@ -221,32 +208,37 @@ async function generateAll() {
       border: 2px solid #fbbf24;
       width: 100%;
       border-radius: 8px;
-      padding: 2.5px 0;
+      padding: 3px 0;
       color: #ffffff;
       font-family: 'Playfair Display', serif;
-      font-size: 13.5px;
+      font-size: 15px;
       font-weight: 900;
-      letter-spacing: 2px;
+      letter-spacing: 3px;
       box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+      margin: 3px 0;
     }
 
-    /* QR Code Box — BIG & PROMINENT */
+    /* QR Code Box — MASSIVE & FILLING ALL AVAILABLE SPACE */
     .qr-box {
       background: #ffffff;
-      border: 2px solid #e5e7eb;
-      border-radius: 14px;
+      border: 2.5px solid #e5e7eb;
+      border-radius: 16px;
       padding: 6px;
       display: flex;
       align-items: center;
       justify-content: center;
       margin: auto 0;
-      box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+      width: 100%;
+      max-width: 255px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
     }
 
     .qr-img {
-      width: 195px;
-      height: 195px;
+      width: 240px;
+      height: 240px;
+      max-width: 100%;
       display: block;
+      object-fit: contain;
     }
 
     /* 4-Step Instructions */
@@ -259,7 +251,7 @@ async function generateAll() {
       border: 1px solid #fecaca;
       border-radius: 8px;
       padding: 3px 2px;
-      margin-top: 2px;
+      margin-top: 3px;
     }
 
     .step-item {
@@ -284,14 +276,14 @@ async function generateAll() {
     }
 
     .step-text {
-      font-size: 7px;
+      font-size: 7.5px;
       font-weight: 800;
       color: #1f2937;
       line-height: 1.1;
     }
 
     .step-sub {
-      font-size: 6px;
+      font-size: 6.5px;
       color: #6b7280;
     }
 
@@ -301,10 +293,10 @@ async function generateAll() {
       color: #ffffff;
       width: 100%;
       border-radius: 6px;
-      padding: 2.5px 2px;
-      font-size: 6.5px;
+      padding: 3px 2px;
+      font-size: 7px;
       font-weight: 700;
-      margin-top: 2px;
+      margin-top: 3px;
       letter-spacing: 0.3px;
     }
 
@@ -351,14 +343,9 @@ async function generateAll() {
           <div class="card">
             <!-- Header -->
             <div class="header">
-              <p class="badge-sub">⭐ पुण्याचे सुप्रसिद्ध ⭐</p>
+              <p class="badge-sub">⭐ पुण्याचे सुप्रसिद्ध • थेट टेबलवरून ऑर्डर करा ⭐</p>
               <h2 class="brand-title">सुदामा भेळ ॲन्ड स्नॅक्स</h2>
-              <p class="brand-eng">SUDAMA BHEL • LONI KALBHOR</p>
-            </div>
-
-            <!-- Value Banner -->
-            <div class="tagline">
-              ⚡ रांगेत थांबू नका! थेट टेबलवरून ऑर्डर करा ⚡
+              <p class="brand-eng">SUDAMA BHEL • LONI KALBHOR, PUNE</p>
             </div>
 
             <!-- Table Badge -->
@@ -366,7 +353,7 @@ async function generateAll() {
               TABLE ${table.num < 10 ? '0' + table.num : table.num}
             </div>
 
-            <!-- Center QR Code -->
+            <!-- Giant Center QR Code -->
             <div class="qr-box">
               <img class="qr-img" src="${table.qrDataUrl}" alt="Table ${table.num} QR Code" />
             </div>

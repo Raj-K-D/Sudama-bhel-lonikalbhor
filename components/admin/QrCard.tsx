@@ -544,24 +544,15 @@ function TableStickerCard({
         className={`flex flex-col items-center justify-between rounded-2xl ${themeStyles.cardBg} p-4 border-4 ${themeStyles.border} shadow-lg text-center select-none overflow-hidden h-full min-h-[460px] print:min-h-[480px]`}
       >
         {/* Top Header Card */}
-        <div className={`w-full rounded-xl ${themeStyles.headerBg} py-2.5 px-2 shadow-sm`}>
+        <div className={`w-full rounded-xl ${themeStyles.headerBg} py-2 px-2 shadow-sm`}>
           <p className={`text-[10px] font-black tracking-widest uppercase ${themeStyles.headerTitle}`}>
-            ⭐ पुण्याचे सुप्रसिद्ध ⭐
+            ⭐ पुण्याचे सुप्रसिद्ध • थेट टेबलवरून ऑर्डर करा ⭐
           </p>
           <h1 className={`font-georgia text-lg sm:text-xl font-black tracking-wide ${themeStyles.headerSub} leading-tight`}>
             सुदामा भेळ ॲन्ड स्नॅक्स
           </h1>
           <p className="text-[9px] font-bold text-amber-300/90 tracking-wider uppercase">
-            SUDAMA BHEL • LONI KALBHOR
-          </p>
-        </div>
-
-        {/* Catchy Value Banner */}
-        <div className="mt-2 w-full rounded-lg bg-amber-100 border border-amber-300 py-1 px-2">
-          <p className="text-[10px] font-black text-amber-950 flex items-center justify-center gap-1">
-            <span>⚡</span>
-            <span>रांगेत थांबू नका! थेट टेबलवरून ऑर्डर करा</span>
-            <span>⚡</span>
+            SUDAMA BHEL • LONI KALBHOR, PUNE
           </p>
         </div>
 
@@ -574,12 +565,12 @@ function TableStickerCard({
           </p>
         </div>
 
-        {/* High-Contrast QR Code Container — DEAD CENTER, EXTRA LARGE */}
-        <div className="my-auto py-2 flex flex-col items-center justify-center w-full">
-          <div className="rounded-2xl bg-white p-3.5 shadow-inner border border-gray-200 inline-block">
+        {/* High-Contrast QR Code Container — DEAD CENTER, MASSIVE */}
+        <div className="my-auto py-1 flex flex-col items-center justify-center w-full">
+          <div className="rounded-2xl bg-white p-3 shadow-inner border border-gray-200 inline-block">
             <QRCodeSVG
               value={qrData}
-              size={225}
+              size={235}
               bgColor="#ffffff"
               fgColor="#111827"
               level="H"
