@@ -412,13 +412,23 @@ export default function QrCard() {
 
         {/* Action Buttons */}
         <div className="flex flex-wrap items-center gap-2">
+          <a
+            href="/table-qr-stickers.html"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1.5 rounded-2xl bg-white/20 hover:bg-white/30 px-4 py-2 font-georgia text-xs font-bold text-white transition-all active:scale-95"
+          >
+            <span>📄</span>
+            <span>Open Ready A4 Document</span>
+          </a>
+
           <button
             onClick={handleDownloadAllZip}
             disabled={isExporting}
             className="flex items-center gap-1.5 rounded-2xl bg-accent-gold px-4 py-2 font-georgia text-xs font-black text-black shadow-premium hover:bg-accent-gold/90 transition-all active:scale-95 disabled:opacity-50"
           >
             <span>📦</span>
-            <span>Download All {tableCount} Images (.ZIP)</span>
+            <span>Download All {tableCount} (.ZIP)</span>
           </button>
 
           <button
@@ -536,13 +546,13 @@ function TableStickerCard({
         {/* Top Header Card */}
         <div className={`w-full rounded-xl ${themeStyles.headerBg} py-2.5 px-2 shadow-sm`}>
           <p className={`text-[10px] font-black tracking-widest uppercase ${themeStyles.headerTitle}`}>
-            ⭐ PUNE&apos;S FAMOUS ⭐
+            ⭐ पुण्याचे सुप्रसिद्ध ⭐
           </p>
           <h1 className={`font-georgia text-lg sm:text-xl font-black tracking-wide ${themeStyles.headerSub} leading-tight`}>
-            SUDAMA BHEL &amp; SNACKS
+            सुदामा भेळ ॲन्ड स्नॅक्स
           </h1>
           <p className="text-[9px] font-bold text-amber-300/90 tracking-wider uppercase">
-            LONI KALBHOR • PUNE
+            SUDAMA BHEL • LONI KALBHOR
           </p>
         </div>
 
@@ -550,7 +560,7 @@ function TableStickerCard({
         <div className="mt-2 w-full rounded-lg bg-amber-100 border border-amber-300 py-1 px-2">
           <p className="text-[10px] font-black text-amber-950 flex items-center justify-center gap-1">
             <span>⚡</span>
-            <span>SKIP THE LINE • SCAN &amp; ORDER AT TABLE</span>
+            <span>रांगेत थांबू नका! थेट टेबलवरून ऑर्डर करा</span>
             <span>⚡</span>
           </p>
         </div>
@@ -578,16 +588,16 @@ function TableStickerCard({
           </div>
         </div>
 
-        {/* 3-Step Simple Guide (English) */}
+        {/* 4-Step Simple Guide (1 2 3 4) */}
         <div className={`w-full rounded-xl border ${themeStyles.stepBox} p-2`}>
-          <div className="grid grid-cols-3 gap-1 text-left">
+          <div className="grid grid-cols-4 gap-1 text-left">
             <div className="flex items-center gap-1">
               <span className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full text-[9px] font-black ${themeStyles.stepBadge}`}>
                 1
               </span>
               <div>
-                <p className="text-[9px] font-black leading-tight">Scan QR</p>
-                <p className="text-[7px] opacity-75">Camera/App</p>
+                <p className="text-[8.5px] font-black leading-tight">स्कॅन करा</p>
+                <p className="text-[7px] opacity-75">Scan QR</p>
               </div>
             </div>
 
@@ -596,8 +606,8 @@ function TableStickerCard({
                 2
               </span>
               <div>
-                <p className="text-[9px] font-black leading-tight">Pick Food</p>
-                <p className="text-[7px] opacity-75">Select Items</p>
+                <p className="text-[8.5px] font-black leading-tight">मेनू निवडा</p>
+                <p className="text-[7px] opacity-75">Pick Items</p>
               </div>
             </div>
 
@@ -606,8 +616,18 @@ function TableStickerCard({
                 3
               </span>
               <div>
-                <p className="text-[9px] font-black leading-tight">Served</p>
-                <p className="text-[7px] opacity-75">At Table</p>
+                <p className="text-[8.5px] font-black leading-tight">ऑर्डर करा</p>
+                <p className="text-[7px] opacity-75">Order</p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-1">
+              <span className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full text-[9px] font-black ${themeStyles.stepBadge}`}>
+                4
+              </span>
+              <div>
+                <p className="text-[8.5px] font-black leading-tight">टेबलवर जेवा</p>
+                <p className="text-[7px] opacity-75">Served</p>
               </div>
             </div>
           </div>
