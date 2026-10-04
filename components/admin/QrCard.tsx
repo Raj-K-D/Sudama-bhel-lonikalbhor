@@ -180,22 +180,22 @@ export default function QrCard() {
     ctx.font = '900 56px "Georgia", serif, sans-serif';
     ctx.fillText(`TABLE ${tableNum < 10 ? '0' + tableNum : tableNum}`, 600, 510);
 
-    // 6. Center QR Code Container (PERFECTLY CENTERED)
+    // 6. Center QR Code Container (PERFECTLY CENTERED & EXTRA LARGE)
     ctx.fillStyle = '#FFFFFF';
     ctx.beginPath();
-    ctx.roundRect(300, 570, 600, 640, 36);
+    ctx.roundRect(240, 560, 720, 680, 36);
     ctx.fill();
     ctx.strokeStyle = '#E5E7EB';
     ctx.lineWidth = 6;
     ctx.stroke();
 
-    // Draw QR Code from hidden pre-rendered canvas right in the middle
+    // Draw QR Code from hidden pre-rendered canvas right in the middle (600x600 px)
     const existingCanvas = document.getElementById(`qr-canvas-hidden-${tableNum}`) as HTMLCanvasElement | null;
     if (existingCanvas) {
-      ctx.drawImage(existingCanvas, 340, 620, 520, 520);
+      ctx.drawImage(existingCanvas, 300, 600, 600, 600);
     } else {
       ctx.fillStyle = '#111827';
-      ctx.fillRect(340, 620, 520, 520);
+      ctx.fillRect(300, 600, 600, 600);
     }
 
     // 7. 3-Step Simple Guide Section (English)
@@ -574,12 +574,12 @@ function TableStickerCard({
           </p>
         </div>
 
-        {/* High-Contrast QR Code Container — DEAD CENTER, NO TEXT BELOW */}
+        {/* High-Contrast QR Code Container — DEAD CENTER, EXTRA LARGE */}
         <div className="my-auto py-2 flex flex-col items-center justify-center w-full">
-          <div className="rounded-2xl bg-white p-3 shadow-inner border border-gray-200 inline-block">
+          <div className="rounded-2xl bg-white p-3.5 shadow-inner border border-gray-200 inline-block">
             <QRCodeSVG
               value={qrData}
-              size={175}
+              size={225}
               bgColor="#ffffff"
               fgColor="#111827"
               level="H"
