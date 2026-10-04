@@ -98,9 +98,9 @@ export default function AdminPage() {
     }
     navigator.geolocation.getCurrentPosition(
       (pos) => {
-        saveRestaurantLocation(pos.coords.latitude, pos.coords.longitude, 200, true);
+        saveRestaurantLocation(pos.coords.latitude, pos.coords.longitude, 10, true);
         setGeoConfig(getRestaurantLocation());
-        setGeoNotice(`✅ Shop location calibrated! (${pos.coords.latitude.toFixed(4)}, ${pos.coords.longitude.toFixed(4)})`);
+        setGeoNotice(`✅ Shop location calibrated! (${pos.coords.latitude.toFixed(4)}, ${pos.coords.longitude.toFixed(4)}) - 10m range active`);
         setTimeout(() => setGeoNotice(null), 4000);
       },
       () => {
@@ -195,7 +195,7 @@ export default function AdminPage() {
           <span>
             Anti-Fake Orders Geofence:{' '}
             <strong className={geoConfig?.enabled ? 'text-accent-green' : 'text-gray-400'}>
-              {geoConfig?.enabled ? 'Active (Loni Kalbhor 500m radius)' : 'Disabled (Testing / Demo Mode)'}
+              {geoConfig?.enabled ? 'Active (10m table radius)' : 'Disabled (Testing / Demo Mode)'}
             </strong>
           </span>
           {geoNotice && <span className="text-accent-gold font-bold">{geoNotice}</span>}

@@ -10,14 +10,14 @@ import BillingInvoice from '@/components/cart/BillingInvoice';
 
 export default function CartPage() {
   const [mounted, setMounted] = useState(false);
-  const { tableNumber, getOrdersForTable, cart } = useStore();
+  const { tableNumber, getCustomerOrders, cart } = useStore();
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
   const currentTable = mounted ? tableNumber : 1;
-  const placedOrders = mounted ? getOrdersForTable(currentTable) : [];
+  const placedOrders = mounted ? getCustomerOrders(currentTable) : [];
   const hasContent = mounted && (placedOrders.length > 0 || cart.length > 0);
 
   return (

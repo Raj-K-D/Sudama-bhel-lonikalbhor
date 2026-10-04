@@ -19,5 +19,12 @@ export const TOTAL_TABLES = parseInt(process.env.NEXT_PUBLIC_TOTAL_TABLES ?? '12
 /** Default Restaurant GPS Location (Sudama Bhel, Loni Kalbhor, Pune) & Geofence */
 export const DEFAULT_RESTAURANT_LAT = parseFloat(process.env.NEXT_PUBLIC_RESTAURANT_LAT ?? '18.4830');
 export const DEFAULT_RESTAURANT_LNG = parseFloat(process.env.NEXT_PUBLIC_RESTAURANT_LNG ?? '74.0320');
-export const DEFAULT_GEOFENCE_RADIUS_METERS = parseInt(process.env.NEXT_PUBLIC_GEOFENCE_RADIUS ?? '500', 10);
+export const DEFAULT_GEOFENCE_RADIUS_METERS = parseInt(process.env.NEXT_PUBLIC_GEOFENCE_RADIUS ?? '10', 10);
+
+/** Verified Sudama Bhel Counter UPI Merchant Details */
+export const SUDAMA_UPI_VPA = 'ombk.AAEA519301ndrbatquc5@mbk';
+export const SUDAMA_PAYEE_NAME = 'MobikwikMerchant';
+export const SUDAMA_MERCHANT_CODE = '5499';
+export const SUDAMA_MBK_MC = 'AAEA51930';
+export const SUDAMA_TR = 'OMBAAEA519301ndrbatquc5';
 

@@ -13,9 +13,10 @@ export default function AccountPage() {
     setTableNumber,
     totalTables,
     cart,
-    getOrdersForTable,
+    getCustomerOrders,
     getTableTotal,
     isBillPaid,
+    resetSession,
   } = useStore();
 
   useEffect(() => {
@@ -23,7 +24,7 @@ export default function AccountPage() {
   }, []);
 
   const currentTable = mounted ? tableNumber : 1;
-  const orders = mounted ? getOrdersForTable(currentTable) : [];
+  const orders = mounted ? getCustomerOrders(currentTable) : [];
   const totalSpent = mounted ? getTableTotal(currentTable) : 0;
   const itemsInCart = mounted ? cartItemCount(cart) : 0;
 
@@ -62,9 +63,9 @@ export default function AccountPage() {
         </div>
 
         {/* ── Session Summary ────────────────────────────────────────── */}
-        <div className="rounded-3xl border border-primary/15 bg-surface p-5 shadow-soft">
+        <div className="rounded-3xl border border-primary/15 bg-surface p-5 shadow-soft space-y-4">
           <h2 className="font-georgia text-base font-bold text-text-dark">Session Summary</h2>
-          <div className="mt-4 space-y-3">
+          <div className="space-y-3">
             <SummaryRow icon="🧾" label="Orders Placed" value={`${orders.length}`} />
             <SummaryRow icon="🛍️" label="Items in Cart" value={`${itemsInCart}`} />
             <SummaryRow icon="₹" label="Total Spent" value={`₹${totalSpent.toFixed(0)}`} />
@@ -75,6 +76,17 @@ export default function AccountPage() {
               valueColor={mounted && isBillPaid ? 'text-accent-green' : 'text-accent-red'}
             />
           </div>
+
+          <button
+            onClick={() => {
+              if (window.confirm('Start a fresh dining session on this phone? This will clear your current cart and order view.')) {
+                resetSession();
+              }
+            }}
+            className="w-full rounded-2xl border border-border bg-background py-2.5 text-xs font-bold text-text-muted hover:text-red-500 hover:border-red-300 transition-colors"
+          >
+            🔄 Start Fresh / Reset My Table Session
+          </button>
         </div>
 
         {/* ── About ──────────────────────────────────────────────────── */}

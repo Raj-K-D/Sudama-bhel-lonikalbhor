@@ -24,8 +24,10 @@ interface RestaurantStore {
   updateCartItemNotes: (itemId: string, notes: string) => void;
   clearCart: () => void;
 
+  sessionOrderIds: string[];
   placedOrders: Record<number, Order[]>;
   getOrdersForTable: (table: number) => Order[];
+  getCustomerOrders: (table: number) => Order[];
   getTableTotal: (table: number) => number;
   placeOrder: () => void;
   updateOrderStatus: (tableNum: number, orderId: string, status: OrderStatus) => void;
@@ -112,17 +114,26 @@ export const useStore = create<RestaurantStore>()(
       clearCart: () => set({ cart: [] }),
 
       // ── Orders ──────────────────────────────────────────────────────────────
+      sessionOrderIds: [],
       placedOrders: {},
 
+      // For Kitchen Admin Dashboard (returns all orders for this table)
       getOrdersForTable: (table) => get().placedOrders[table] ?? [],
 
+      // For Customer Side (returns only orders placed by this customer/device in the current sitting)
+      getCustomerOrders: (table) => {
+        const { placedOrders, sessionOrderIds } = get();
+        const tableOrders = placedOrders[table] ?? [];
+        return tableOrders.filter((o) => sessionOrderIds.includes(o.id));
+      },
+
       getTableTotal: (table) =>
-        (get().placedOrders[table] ?? []).reduce(
+        get().getCustomerOrders(table).reduce(
           (sum, order) => sum + (order.totalAmount ?? 0), 0,
         ),
 
       placeOrder: async () => {
-        const { cart, tableNumber, weather } = get();
+        const { cart, tableNumber, weather, sessionOrderIds } = get();
         if (!cart.length) return;
 
         const sb = getSupabase();
@@ -143,9 +154,14 @@ export const useStore = create<RestaurantStore>()(
           weatherMode: weather,
         };
 
-        // Optimistic local update
+        // Optimistic local update + add order to device's active session
         const existing = get().placedOrders[tableNumber] ?? [];
-        set({ placedOrders: { ...get().placedOrders, [tableNumber]: [...existing, newOrder] }, cart: [], isBillPaid: false });
+        set({
+          placedOrders: { ...get().placedOrders, [tableNumber]: [...existing, newOrder] },
+          sessionOrderIds: [...sessionOrderIds, id],
+          cart: [],
+          isBillPaid: false,
+        });
 
         if (sb) {
           try {
@@ -226,8 +242,11 @@ export const useStore = create<RestaurantStore>()(
       isBillPaid: false,
       markBillAsPaid: () => set({ isBillPaid: true }),
       resetSession: () => {
-        const { tableNumber } = get();
-        set({ cart: [], isBillPaid: false, placedOrders: { ...get().placedOrders, [tableNumber]: [] } });
+        set({
+          cart: [],
+          isBillPaid: false,
+          sessionOrderIds: [],
+        });
       },
 
       // ── Weather ─────────────────────────────────────────────────────────────
@@ -419,6 +438,7 @@ export const useStore = create<RestaurantStore>()(
         tableNumber: s.tableNumber,
         totalTables: s.totalTables,
         placedOrders: s.placedOrders,
+        sessionOrderIds: s.sessionOrderIds,
         assistanceRequests: s.assistanceRequests,
       }),
     },
