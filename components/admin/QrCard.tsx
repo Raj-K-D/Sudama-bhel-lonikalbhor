@@ -548,10 +548,10 @@ function TableStickerCard({
           <p className={`text-[10px] font-black tracking-widest uppercase ${themeStyles.headerTitle}`}>
             ⭐ पुण्याचे सुप्रसिद्ध • थेट टेबलवरून ऑर्डर करा ⭐
           </p>
-          <h1 className={`font-georgia text-lg sm:text-xl font-black tracking-wide ${themeStyles.headerSub} leading-tight`}>
+          <h1 className={`font-georgia text-xl sm:text-2xl font-black tracking-wide ${themeStyles.headerSub} leading-tight`}>
             सुदामा भेळ ॲन्ड स्नॅक्स
           </h1>
-          <p className="text-[9px] font-bold text-amber-300/90 tracking-wider uppercase">
+          <p className="text-[10px] font-bold text-amber-300/90 tracking-wider uppercase">
             SUDAMA BHEL • LONI KALBHOR, PUNE
           </p>
         </div>
@@ -560,7 +560,7 @@ function TableStickerCard({
         <div
           className={`w-full rounded-xl py-1.5 px-3 shadow-sm border-2 ${themeStyles.tableBanner}`}
         >
-          <p className="font-georgia text-base sm:text-lg font-black tracking-[3px]">
+          <p className="font-georgia text-lg sm:text-xl font-black tracking-[4px]">
             TABLE {tableNum < 10 ? '0' + tableNum : tableNum}
           </p>
         </div>
@@ -570,7 +570,7 @@ function TableStickerCard({
           <div className="rounded-2xl bg-white p-2 shadow-inner border border-gray-200 inline-block">
             <QRCodeSVG
               value={qrData}
-              size={260}
+              size={250}
               bgColor="#ffffff"
               fgColor="#111827"
               level="H"
@@ -581,51 +581,43 @@ function TableStickerCard({
 
         {/* 4-Step Simple Guide (1 2 3 4) */}
         <div className={`w-full rounded-xl border ${themeStyles.stepBox} p-2`}>
-          <div className="grid grid-cols-4 gap-1 text-left">
-            <div className="flex items-center gap-1">
-              <span className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full text-[9px] font-black ${themeStyles.stepBadge}`}>
-                1
+          <div className="grid grid-cols-4 gap-1.5 text-center">
+            <div className="flex flex-col items-center">
+              <span className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full text-[9px] font-black mb-0.5 ${themeStyles.stepBadge}`}>
+                १
               </span>
-              <div>
-                <p className="text-[8.5px] font-black leading-tight">स्कॅन करा</p>
-                <p className="text-[7px] opacity-75">Scan QR</p>
-              </div>
+              <p className="text-[10px] font-black leading-tight text-gray-900">स्कॅन करा</p>
+              <p className="text-[8px] font-bold text-gray-600">Scan QR</p>
             </div>
 
-            <div className="flex items-center gap-1">
-              <span className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full text-[9px] font-black ${themeStyles.stepBadge}`}>
-                2
+            <div className="flex flex-col items-center">
+              <span className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full text-[9px] font-black mb-0.5 ${themeStyles.stepBadge}`}>
+                २
               </span>
-              <div>
-                <p className="text-[8.5px] font-black leading-tight">मेनू निवडा</p>
-                <p className="text-[7px] opacity-75">Pick Items</p>
-              </div>
+              <p className="text-[10px] font-black leading-tight text-gray-900">मेनू निवडा</p>
+              <p className="text-[8px] font-bold text-gray-600">Pick Items</p>
             </div>
 
-            <div className="flex items-center gap-1">
-              <span className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full text-[9px] font-black ${themeStyles.stepBadge}`}>
-                3
+            <div className="flex flex-col items-center">
+              <span className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full text-[9px] font-black mb-0.5 ${themeStyles.stepBadge}`}>
+                ३
               </span>
-              <div>
-                <p className="text-[8.5px] font-black leading-tight">ऑर्डर करा</p>
-                <p className="text-[7px] opacity-75">Order</p>
-              </div>
+              <p className="text-[10px] font-black leading-tight text-gray-900">ऑर्डर करा</p>
+              <p className="text-[8px] font-bold text-gray-600">Order</p>
             </div>
 
-            <div className="flex items-center gap-1">
-              <span className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full text-[9px] font-black ${themeStyles.stepBadge}`}>
-                4
+            <div className="flex flex-col items-center">
+              <span className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full text-[9px] font-black mb-0.5 ${themeStyles.stepBadge}`}>
+                ४
               </span>
-              <div>
-                <p className="text-[8.5px] font-black leading-tight">टेबलवर जेवा</p>
-                <p className="text-[7px] opacity-75">Served</p>
-              </div>
+              <p className="text-[10px] font-black leading-tight text-gray-900">टेबलवर जेवा</p>
+              <p className="text-[8px] font-bold text-gray-600">Served</p>
             </div>
           </div>
         </div>
 
         {/* Footer Trust Badges */}
-        <div className={`mt-2 w-full rounded-lg ${themeStyles.footerBg} py-1.5 px-2 text-[9px] font-bold`}>
+        <div className={`mt-1.5 w-full rounded-lg ${themeStyles.footerBg} py-1.5 px-2 text-[9.5px] font-bold`}>
           <p className="leading-tight">
             ✨ No App Needed • Contactless Menu • Pay via UPI / Cash
           </p>

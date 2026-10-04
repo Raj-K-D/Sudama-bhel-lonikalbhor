@@ -121,7 +121,7 @@ async function generateAll() {
       display: grid;
       grid-template-columns: 1fr 1fr;
       grid-template-rows: 1fr 1fr;
-      gap: 4mm;
+      gap: 3mm;
       box-shadow: 0 8px 30px rgba(0,0,0,0.12);
       border-radius: 8px;
       page-break-after: always;
@@ -133,7 +133,7 @@ async function generateAll() {
     .sticker-container {
       border: 2px dashed #9ca3af;
       border-radius: 20px;
-      padding: 5px;
+      padding: 4px;
       position: relative;
       display: flex;
       flex-direction: column;
@@ -148,13 +148,13 @@ async function generateAll() {
       left: 16px;
       background: #ffffff;
       padding: 0 6px;
-      font-size: 9px;
-      font-weight: 700;
+      font-size: 9.5px;
+      font-weight: 800;
       color: #6b7280;
     }
 
     .card {
-      border: 4px solid #dc2626;
+      border: 3.5px solid #dc2626;
       border-radius: 16px;
       background: #ffffff;
       height: 100%;
@@ -162,99 +162,99 @@ async function generateAll() {
       flex-direction: column;
       align-items: center;
       justify-content: flex-start;
-      padding: 4px 6px;
-      gap: 2px;
+      padding: 5px 6px;
+      gap: 0;
       text-align: center;
       box-shadow: inset 0 0 0 1px #fef08a;
     }
 
-    /* Header */
+    /* Header — LARGE, CRISP & CLEAR */
     .header {
       background: linear-gradient(180deg, #b91c1c 0%, #dc2626 100%);
       width: 100%;
-      border-radius: 8px;
-      padding: 3px 6px;
+      border-radius: 9px;
+      padding: 4px 6px;
       color: #ffffff;
       box-shadow: 0 2px 6px rgba(185, 28, 28, 0.3);
     }
 
     .badge-sub {
-      font-size: 8px;
+      font-size: 9.5px;
       font-weight: 800;
       color: #fef08a;
-      letter-spacing: 1px;
+      letter-spacing: 0.8px;
       text-transform: uppercase;
     }
 
     .brand-title {
       font-family: 'Mukta', sans-serif;
-      font-size: 15px;
+      font-size: 20px;
       font-weight: 900;
-      line-height: 1.1;
+      line-height: 1.15;
       color: #ffffff;
       margin: 1px 0;
       text-shadow: 0 1px 2px rgba(0,0,0,0.3);
     }
 
     .brand-eng {
-      font-size: 7.5px;
+      font-size: 9.5px;
       font-weight: 800;
       color: #fde047;
-      letter-spacing: 0.8px;
+      letter-spacing: 1px;
     }
 
-    /* Table Banner */
+    /* Table Banner — LARGE & PROMINENT */
     .table-banner {
       background: #dc2626;
       border: 2px solid #fbbf24;
       width: 100%;
       border-radius: 8px;
-      padding: 2px 0;
+      padding: 3px 0;
       color: #ffffff;
       font-family: 'Playfair Display', serif;
-      font-size: 15px;
+      font-size: 19px;
       font-weight: 900;
-      letter-spacing: 3px;
+      letter-spacing: 4px;
       box-shadow: 0 2px 4px rgba(0,0,0,0.15);
-      margin: 1px 0 2px;
+      margin: 3px 0 0 0;
     }
 
-    /* QR Code Box — STARTS DIRECTLY BELOW TEXT WITH ZERO WASTED SPACE */
+    /* QR Code Box — STARTS DIRECTLY BELOW TABLE BANNER (ZERO GAP) AND ENDS DIRECTLY BEFORE 4-STEP ROW */
     .qr-box {
       background: #ffffff;
       border: 2px solid #e5e7eb;
       border-radius: 14px;
-      padding: 2px;
+      padding: 4px;
       display: flex;
       align-items: center;
       justify-content: center;
       flex: 1;
       width: 100%;
-      margin: 0;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+      margin: 2px 0 2px 0;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.06);
       overflow: hidden;
     }
 
     .qr-img {
-      width: 275px;
-      height: 275px;
+      width: 255px;
+      height: 255px;
       max-width: 100%;
       max-height: 100%;
       display: block;
       object-fit: contain;
     }
 
-    /* 4-Step Instructions */
+    /* 4-Step Instructions — CLEAR, BOLD & READABLE */
     .steps-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 2px;
+      gap: 3px;
       width: 100%;
       background: #fef2f2;
       border: 1px solid #fecaca;
-      border-radius: 6px;
-      padding: 2px;
-      margin: 1px 0 0;
+      border-radius: 8px;
+      padding: 4px 3px;
+      margin: 0;
     }
 
     .step-item {
@@ -267,27 +267,28 @@ async function generateAll() {
     .step-num {
       background: #dc2626;
       color: #ffffff;
-      width: 12px;
-      height: 12px;
+      width: 16px;
+      height: 16px;
       border-radius: 50%;
-      font-size: 7px;
+      font-size: 9.5px;
       font-weight: 900;
       display: flex;
       align-items: center;
       justify-content: center;
-      margin-bottom: 1px;
+      margin-bottom: 2px;
     }
 
     .step-text {
-      font-size: 7.5px;
-      font-weight: 800;
+      font-size: 10.5px;
+      font-weight: 900;
       color: #1f2937;
-      line-height: 1.1;
+      line-height: 1.15;
     }
 
     .step-sub {
-      font-size: 6.5px;
-      color: #6b7280;
+      font-size: 8.5px;
+      font-weight: 700;
+      color: #4b5563;
     }
 
     /* Footer */
@@ -296,10 +297,10 @@ async function generateAll() {
       color: #ffffff;
       width: 100%;
       border-radius: 6px;
-      padding: 2px;
-      font-size: 7px;
-      font-weight: 700;
-      margin: 1px 0 0;
+      padding: 3px;
+      font-size: 9px;
+      font-weight: 800;
+      margin: 3px 0 0 0;
       letter-spacing: 0.3px;
     }
 
