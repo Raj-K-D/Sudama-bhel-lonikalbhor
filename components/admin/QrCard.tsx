@@ -541,7 +541,7 @@ function TableStickerCard({
 
       {/* Main Sticker Body */}
       <div
-        className={`flex flex-col items-center justify-between rounded-2xl ${themeStyles.cardBg} p-4 border-4 ${themeStyles.border} shadow-lg text-center select-none overflow-hidden h-full min-h-[460px] print:min-h-[480px]`}
+        className={`flex flex-col items-center justify-start gap-1.5 rounded-2xl ${themeStyles.cardBg} p-2.5 border-4 ${themeStyles.border} shadow-lg text-center select-none overflow-hidden h-full min-h-[460px] print:min-h-[480px]`}
       >
         {/* Top Header Card */}
         <div className={`w-full rounded-xl ${themeStyles.headerBg} py-2 px-2 shadow-sm`}>
@@ -558,19 +558,19 @@ function TableStickerCard({
 
         {/* Prominent Table Badge */}
         <div
-          className={`mt-2 w-full rounded-xl py-1.5 px-3 shadow-sm border-2 ${themeStyles.tableBanner}`}
+          className={`w-full rounded-xl py-1.5 px-3 shadow-sm border-2 ${themeStyles.tableBanner}`}
         >
           <p className="font-georgia text-base sm:text-lg font-black tracking-[3px]">
             TABLE {tableNum < 10 ? '0' + tableNum : tableNum}
           </p>
         </div>
 
-        {/* High-Contrast QR Code Container — DEAD CENTER, MASSIVE */}
-        <div className="my-auto py-1 flex flex-col items-center justify-center w-full">
-          <div className="rounded-2xl bg-white p-3 shadow-inner border border-gray-200 inline-block">
+        {/* High-Contrast QR Code Container — STARTS DIRECTLY BELOW, ZERO GAP, EXTRA LARGE */}
+        <div className="flex-1 flex items-center justify-center w-full my-0 py-0.5">
+          <div className="rounded-2xl bg-white p-2 shadow-inner border border-gray-200 inline-block">
             <QRCodeSVG
               value={qrData}
-              size={235}
+              size={260}
               bgColor="#ffffff"
               fgColor="#111827"
               level="H"

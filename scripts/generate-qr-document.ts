@@ -161,8 +161,9 @@ async function generateAll() {
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: space-between;
-      padding: 6px 8px;
+      justify-content: flex-start;
+      padding: 4px 6px;
+      gap: 2px;
       text-align: center;
       box-shadow: inset 0 0 0 1px #fef08a;
     }
@@ -171,8 +172,8 @@ async function generateAll() {
     .header {
       background: linear-gradient(180deg, #b91c1c 0%, #dc2626 100%);
       width: 100%;
-      border-radius: 10px;
-      padding: 4px 6px;
+      border-radius: 8px;
+      padding: 3px 6px;
       color: #ffffff;
       box-shadow: 0 2px 6px rgba(185, 28, 28, 0.3);
     }
@@ -189,7 +190,7 @@ async function generateAll() {
       font-family: 'Mukta', sans-serif;
       font-size: 15px;
       font-weight: 900;
-      line-height: 1.15;
+      line-height: 1.1;
       color: #ffffff;
       margin: 1px 0;
       text-shadow: 0 1px 2px rgba(0,0,0,0.3);
@@ -208,35 +209,37 @@ async function generateAll() {
       border: 2px solid #fbbf24;
       width: 100%;
       border-radius: 8px;
-      padding: 3px 0;
+      padding: 2px 0;
       color: #ffffff;
       font-family: 'Playfair Display', serif;
       font-size: 15px;
       font-weight: 900;
       letter-spacing: 3px;
       box-shadow: 0 2px 4px rgba(0,0,0,0.15);
-      margin: 3px 0;
+      margin: 1px 0 2px;
     }
 
-    /* QR Code Box — MASSIVE & FILLING ALL AVAILABLE SPACE */
+    /* QR Code Box — STARTS DIRECTLY BELOW TEXT WITH ZERO WASTED SPACE */
     .qr-box {
       background: #ffffff;
-      border: 2.5px solid #e5e7eb;
-      border-radius: 16px;
-      padding: 6px;
+      border: 2px solid #e5e7eb;
+      border-radius: 14px;
+      padding: 2px;
       display: flex;
       align-items: center;
       justify-content: center;
-      margin: auto 0;
+      flex: 1;
       width: 100%;
-      max-width: 255px;
+      margin: 0;
       box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+      overflow: hidden;
     }
 
     .qr-img {
-      width: 240px;
-      height: 240px;
+      width: 275px;
+      height: 275px;
       max-width: 100%;
+      max-height: 100%;
       display: block;
       object-fit: contain;
     }
@@ -249,9 +252,9 @@ async function generateAll() {
       width: 100%;
       background: #fef2f2;
       border: 1px solid #fecaca;
-      border-radius: 8px;
-      padding: 3px 2px;
-      margin-top: 3px;
+      border-radius: 6px;
+      padding: 2px;
+      margin: 1px 0 0;
     }
 
     .step-item {
@@ -264,10 +267,10 @@ async function generateAll() {
     .step-num {
       background: #dc2626;
       color: #ffffff;
-      width: 13px;
-      height: 13px;
+      width: 12px;
+      height: 12px;
       border-radius: 50%;
-      font-size: 7.5px;
+      font-size: 7px;
       font-weight: 900;
       display: flex;
       align-items: center;
@@ -293,10 +296,10 @@ async function generateAll() {
       color: #ffffff;
       width: 100%;
       border-radius: 6px;
-      padding: 3px 2px;
+      padding: 2px;
       font-size: 7px;
       font-weight: 700;
-      margin-top: 3px;
+      margin: 1px 0 0;
       letter-spacing: 0.3px;
     }
 
