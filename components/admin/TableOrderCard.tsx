@@ -43,12 +43,21 @@ export default function TableOrderCard({ tableNum, orders }: TableOrderCardProps
     const itemsHtml = order.items
       .map((oi) => {
         const m = menu.find((i) => i.id === oi.itemId);
+        const price = m?.price ?? 0;
+        const total = price * oi.quantity;
         return `<tr>
-          <td style="padding:4px 0; font-weight:bold;">${m?.name ?? oi.itemId}</td>
-          <td style="padding:4px 0; text-align:right; font-weight:bold; font-size:16px;">x${oi.quantity}</td>
-        </tr>${oi.notes ? `<tr><td colspan="2" style="font-size:11px; color:#b45309; padding-bottom:6px;"><strong>👉 Note:</strong> ${oi.notes}</td></tr>` : ''}`;
+          <td style="padding:4px 0; font-weight:bold; font-size:12px;">${m?.name ?? oi.itemId}</td>
+          <td style="padding:4px 0; text-align:center; font-size:12px;">₹${price}</td>
+          <td style="padding:4px 0; text-align:center; font-weight:bold; font-size:13px;">x${oi.quantity}</td>
+          <td style="padding:4px 0; text-align:right; font-weight:bold; font-size:12px;">₹${total}</td>
+        </tr>${oi.notes ? `<tr><td colspan="4" style="font-size:11px; color:#b45309; padding-bottom:6px;"><strong>👉 Note:</strong> ${oi.notes}</td></tr>` : ''}`;
       })
       .join('');
+
+    const ticketTotal = order.items.reduce((sum, oi) => {
+      const m = menu.find((i) => i.id === oi.itemId);
+      return sum + (m?.price ?? 0) * oi.quantity;
+    }, 0);
 
     win.document.write(`
       <html>
@@ -59,9 +68,108 @@ export default function TableOrderCard({ tableNum, orders }: TableOrderCardProps
           <p style="margin:4px 0; font-size:16px;"><strong>TABLE: ${table}</strong></p>
           <p style="margin:4px 0; font-size:11px;">Ticket: #${order.id.slice(-6)} | ${new Date(order.timestamp).toLocaleTimeString()}</p>
           <hr style="border:none; border-top:1px dashed #000; margin:8px 0;" />
-          <table style="width:100%; border-collapse:collapse; font-size:13px;">${itemsHtml}</table>
+          <table style="width:100%; border-collapse:collapse;">
+            <thead>
+              <tr style="border-bottom:1px dashed #000; font-size:11px;">
+                <th style="text-align:left; padding-bottom:4px;">Item</th>
+                <th style="text-align:center; padding-bottom:4px;">Price</th>
+                <th style="text-align:center; padding-bottom:4px;">Qty</th>
+                <th style="text-align:right; padding-bottom:4px;">Total</th>
+              </tr>
+            </thead>
+            <tbody>${itemsHtml}</tbody>
+          </table>
           <hr style="border:none; border-top:1px dashed #000; margin:8px 0;" />
-          <p style="text-align:center; font-size:11px; margin:4px 0;">-- Send to Kitchen Counter --</p>
+          <div style="display:flex; justify-content:space-between; font-weight:bold; font-size:13px;">
+            <span>Ticket Total:</span>
+            <span>₹${ticketTotal}</span>
+          </div>
+          <p style="text-align:center; font-size:11px; margin:8px 0 0;">-- Send to Kitchen Counter --</p>
+        </body>
+      </html>
+    `);
+    win.document.close();
+    win.focus();
+    setTimeout(() => {
+      win.print();
+      win.close();
+    }, 400);
+  };
+
+  const printBill = (table: number, ordersToPrint: Order[]) => {
+    if (typeof window === 'undefined') return;
+    const win = window.open('', '_blank', 'width=380,height=600');
+    if (!win) return;
+
+    let grandTotal = 0;
+    const itemsHtml = ordersToPrint
+      .flatMap((order) => order.items)
+      .map((oi) => {
+        const m = menu.find((i) => i.id === oi.itemId);
+        const price = m?.price ?? 0;
+        const total = price * oi.quantity;
+        grandTotal += total;
+        return `<tr>
+          <td style="padding:4px 0; font-weight:bold; font-size:12px;">${m?.name ?? oi.itemId}</td>
+          <td style="padding:4px 0; text-align:center; font-size:12px;">₹${price}</td>
+          <td style="padding:4px 0; text-align:center; font-weight:bold; font-size:12px;">x${oi.quantity}</td>
+          <td style="padding:4px 0; text-align:right; font-weight:bold; font-size:12px;">₹${total}</td>
+        </tr>${oi.notes ? `<tr><td colspan="4" style="font-size:10px; color:#666; padding-bottom:4px;">* ${oi.notes}</td></tr>` : ''}`;
+      })
+      .join('');
+
+    win.document.write(`
+      <html>
+        <head>
+          <title>Bill Receipt - Table ${table}</title>
+          <style>
+            @page { size: 80mm auto; margin: 4mm; }
+            body { font-family: monospace, sans-serif; padding: 8px; width: 280px; margin: 0 auto; color: #000; }
+            .center { text-align: center; }
+            .bold { font-weight: bold; }
+            .dashed { border-top: 1px dashed #000; margin: 8px 0; }
+            table { width: 100%; border-collapse: collapse; }
+            th { border-bottom: 1px dashed #000; padding: 4px 0; font-size: 11px; text-transform: uppercase; }
+          </style>
+        </head>
+        <body>
+          <div class="center">
+            <h2 style="margin: 0; font-size: 18px;">सुदामा भेळ ॲन्ड स्नॅक्स</h2>
+            <h3 style="margin: 2px 0 4px; font-size: 14px;">SUDAMA BHEL</h3>
+            <p style="font-size: 10px; margin: 0;">Pune-Solapur Highway, Loni Kalbhor</p>
+          </div>
+          <div class="dashed"></div>
+          <div style="font-size: 12px; display: flex; justify-content: space-between;">
+            <span class="bold">TABLE: ${table}</span>
+            <span>${new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}</span>
+          </div>
+          <div style="font-size: 10px; color: #444; margin-top: 2px;">
+            Date: ${new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
+          </div>
+          <div class="dashed"></div>
+          <table>
+            <thead>
+              <tr>
+                <th style="text-align:left;">Item</th>
+                <th style="text-align:center;">Price</th>
+                <th style="text-align:center;">Qty</th>
+                <th style="text-align:right;">Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${itemsHtml}
+            </tbody>
+          </table>
+          <div class="dashed"></div>
+          <div style="display: flex; justify-content: space-between; font-size: 14px; font-weight: bold;">
+            <span>TOTAL AMOUNT:</span>
+            <span>₹${grandTotal}</span>
+          </div>
+          <div class="dashed"></div>
+          <div class="center" style="font-size: 11px; margin-top: 8px;">
+            <p style="margin: 4px 0 0; font-size: 11px;">धन्यवाद! पुन्हा भेट द्या.</p>
+            <p style="margin: 2px 0; font-size: 10px;">Thank you! Visit again.</p>
+          </div>
         </body>
       </html>
     `);
@@ -88,10 +196,15 @@ export default function TableOrderCard({ tableNum, orders }: TableOrderCardProps
         >
           TABLE {tableNum}
         </span>
-        <div className="flex items-center gap-2">
-          <span className="text-xs text-white/60">
-            {orders.length} ticket{orders.length !== 1 ? 's' : ''}
-          </span>
+        <div className="flex items-center gap-1.5">
+          <button
+            onClick={() => printBill(tableNum, orders)}
+            title="Print Consolidated Table Bill"
+            className="rounded-lg bg-white/15 hover:bg-white/25 px-2 py-1 text-[11px] font-bold text-white transition-colors flex items-center gap-1"
+          >
+            <span>🧾</span>
+            <span>Print Bill</span>
+          </button>
           <button
             onClick={() => {
               if (window.confirm(`Clear all orders for Table ${tableNum}? (Table finished / bill paid)`)) {
@@ -161,6 +274,14 @@ export default function TableOrderCard({ tableNum, orders }: TableOrderCardProps
                 className="rounded-xl border border-white/20 bg-white/10 px-2.5 py-1 text-xs text-white hover:bg-white/20 transition-colors"
               >
                 🖨️ KOT
+              </button>
+
+              <button
+                onClick={() => printBill(tableNum, [order])}
+                title="Print Ticket Bill Receipt"
+                className="rounded-xl border border-white/20 bg-white/10 px-2.5 py-1 text-xs text-white hover:bg-white/20 transition-colors"
+              >
+                🧾 Bill
               </button>
 
               <button

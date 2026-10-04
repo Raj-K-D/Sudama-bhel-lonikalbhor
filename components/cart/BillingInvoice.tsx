@@ -7,8 +7,6 @@ import DashedLine from '@/components/ui/DashedLine';
 import { useStore } from '@/lib/store';
 import { Order } from '@/lib/menu-data';
 import {
-  TAX_RATE,
-  SERVICE_CHARGE_RATE,
   SUDAMA_UPI_VPA,
   SUDAMA_PAYEE_NAME,
   SUDAMA_MERCHANT_CODE,
@@ -29,7 +27,7 @@ export default function BillingInvoice({ orders }: BillingInvoiceProps) {
   const [isProcessing, setIsProcessing] = useState(false);
   const [cashSelected, setCashSelected] = useState(false);
 
-  // Compute totals
+  // Compute totals (pure sum of items without tax / service charge)
   const orderedTotal = orders.reduce((sum, order) =>
     sum + order.items.reduce((s, oi) => {
       const m = menu.find((i) => i.id === oi.itemId);
@@ -38,9 +36,7 @@ export default function BillingInvoice({ orders }: BillingInvoiceProps) {
   );
   const pendingTotal = cart.reduce((s, c) => s + c.item.price * c.quantity, 0);
   const subtotal = orderedTotal + pendingTotal;
-  const tax = subtotal * TAX_RATE;
-  const serviceCharge = subtotal * SERVICE_CHARGE_RATE;
-  const grandTotal = Math.round(subtotal + tax + serviceCharge);
+  const grandTotal = subtotal;
 
   // Exact UPI query parameter bundle matching Mobikwik merchant counter standard
   const upiParams = new URLSearchParams({
@@ -65,6 +61,117 @@ export default function BillingInvoice({ orders }: BillingInvoiceProps) {
     setTimeout(() => setCopiedUpi(false), 2500);
   };
 
+  const handlePrintBill = () => {
+    if (typeof window === 'undefined') return;
+    const win = window.open('', '_blank', 'width=380,height=600');
+    if (!win) return;
+
+    const allItems: { name: string; price: number; quantity: number; total: number; notes?: string }[] = [];
+
+    orders.forEach((o) => {
+      o.items.forEach((oi) => {
+        const m = menu.find((i) => i.id === oi.itemId);
+        if (m) {
+          allItems.push({
+            name: m.name,
+            price: m.price,
+            quantity: oi.quantity,
+            total: m.price * oi.quantity,
+            notes: oi.notes,
+          });
+        }
+      });
+    });
+
+    cart.forEach((c) => {
+      allItems.push({
+        name: c.item.name,
+        price: c.item.price,
+        quantity: c.quantity,
+        total: c.item.price * c.quantity,
+        notes: c.notes,
+      });
+    });
+
+    const itemsHtml = allItems
+      .map(
+        (item) => `
+        <tr>
+          <td style="padding:4px 0; font-weight:bold; font-size:12px;">${item.name}</td>
+          <td style="padding:4px 0; text-align:center; font-size:12px;">₹${item.price}</td>
+          <td style="padding:4px 0; text-align:center; font-size:12px; font-weight:bold;">${item.quantity}</td>
+          <td style="padding:4px 0; text-align:right; font-size:12px; font-weight:bold;">₹${item.total}</td>
+        </tr>
+        ${item.notes ? `<tr><td colspan="4" style="font-size:10px; color:#666; padding-bottom:4px;">* Note: ${item.notes}</td></tr>` : ''}
+      `
+      )
+      .join('');
+
+    win.document.write(`
+      <html>
+        <head>
+          <title>Bill Receipt - Table ${tableNumber}</title>
+          <style>
+            @page { size: 80mm auto; margin: 4mm; }
+            body { font-family: monospace, sans-serif; padding: 8px; width: 280px; margin: 0 auto; color: #000; }
+            .center { text-align: center; }
+            .bold { font-weight: bold; }
+            .dashed { border-top: 1px dashed #000; margin: 8px 0; }
+            table { width: 100%; border-collapse: collapse; }
+            th { border-bottom: 1px dashed #000; padding: 4px 0; font-size: 11px; text-transform: uppercase; }
+          </style>
+        </head>
+        <body>
+          <div class="center">
+            <h2 style="margin: 0; font-size: 18px;">सुदामा भेळ ॲन्ड स्नॅक्स</h2>
+            <h3 style="margin: 2px 0 4px; font-size: 14px;">SUDAMA BHEL</h3>
+            <p style="font-size: 10px; margin: 0;">Pune-Solapur Highway, Loni Kalbhor</p>
+            <p style="font-size: 10px; margin: 2px 0;">UPI: ${SUDAMA_UPI_VPA}</p>
+          </div>
+          <div class="dashed"></div>
+          <div style="font-size: 12px; display: flex; justify-content: space-between;">
+            <span class="bold">TABLE: ${tableNumber}</span>
+            <span>${new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}</span>
+          </div>
+          <div style="font-size: 10px; color: #444; margin-top: 2px;">
+            Date: ${new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
+          </div>
+          <div class="dashed"></div>
+          <table>
+            <thead>
+              <tr>
+                <th style="text-align:left;">Item</th>
+                <th style="text-align:center;">Price</th>
+                <th style="text-align:center;">Qty</th>
+                <th style="text-align:right;">Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${itemsHtml}
+            </tbody>
+          </table>
+          <div class="dashed"></div>
+          <div style="display: flex; justify-content: space-between; font-size: 14px; font-weight: bold;">
+            <span>TOTAL AMOUNT:</span>
+            <span>₹${grandTotal}</span>
+          </div>
+          <div class="dashed"></div>
+          <div class="center" style="font-size: 11px; margin-top: 8px;">
+            <p style="margin: 2px 0; font-weight: bold;">${isBillPaid ? 'PAYMENT STATUS: PAID ✅' : 'PAYMENT STATUS: DUE / CASH'}</p>
+            <p style="margin: 4px 0 0; font-size: 10px;">धन्यवाद! पुन्हा भेट द्या.</p>
+            <p style="margin: 2px 0; font-size: 10px;">Thank you! Visit again.</p>
+          </div>
+        </body>
+      </html>
+    `);
+    win.document.close();
+    win.focus();
+    setTimeout(() => {
+      win.print();
+      win.close();
+    }, 400);
+  };
+
   const handleConfirmPaid = () => {
     setIsProcessing(true);
     setTimeout(() => {
@@ -80,14 +187,14 @@ export default function BillingInvoice({ orders }: BillingInvoiceProps) {
       ...orders.flatMap((o) =>
         o.items.map((oi) => {
           const m = menu.find((i) => i.id === oi.itemId);
-          return `• ${m?.name ?? 'Item'} x${oi.quantity}: ₹${((m?.price ?? 0) * oi.quantity).toFixed(0)}${
+          return `• ${m?.name ?? 'Item'} (₹${m?.price ?? 0} x ${oi.quantity}): ₹${((m?.price ?? 0) * oi.quantity).toFixed(0)}${
             oi.notes ? ` (${oi.notes})` : ''
           }`;
         }),
       ),
       ...cart.map(
         (c) =>
-          `• ${c.item.name} x${c.quantity}: ₹${(c.item.price * c.quantity).toFixed(0)}${
+          `• ${c.item.name} (₹${c.item.price} x ${c.quantity}): ₹${(c.item.price * c.quantity).toFixed(0)}${
             c.notes ? ` (${c.notes})` : ''
           }`,
       ),
@@ -108,8 +215,6 @@ export default function BillingInvoice({ orders }: BillingInvoiceProps) {
       `--------------------------------\n` +
       `${itemsText}\n` +
       `--------------------------------\n` +
-      `Subtotal: ₹${subtotal.toFixed(0)}\n` +
-      (tax > 0 ? `GST / Tax: ₹${tax.toFixed(0)}\n` : '') +
       `*Total Amount: ₹${grandTotal}*\n` +
       `Payment: ${isBillPaid ? 'Paid ✅' : 'Pending'}\n` +
       `UPI ID: ${SUDAMA_UPI_VPA}\n\n` +
@@ -142,6 +247,7 @@ export default function BillingInvoice({ orders }: BillingInvoiceProps) {
                   key={`${o.id}-${oi.itemId}`}
                   name={m.name}
                   imageUrl={m.imageUrl}
+                  unitPrice={m.price}
                   quantity={oi.quantity}
                   total={m.price * oi.quantity}
                   notes={oi.notes}
@@ -154,6 +260,7 @@ export default function BillingInvoice({ orders }: BillingInvoiceProps) {
               key={c.item.id}
               name={c.item.name}
               imageUrl={c.item.imageUrl}
+              unitPrice={c.item.price}
               quantity={c.quantity}
               total={c.item.price * c.quantity}
               notes={c.notes}
@@ -163,17 +270,6 @@ export default function BillingInvoice({ orders }: BillingInvoiceProps) {
         </div>
 
         <div className="mt-4">
-          <DashedLine />
-        </div>
-
-        {/* Totals */}
-        <div className="mt-4 space-y-1.5">
-          <ReceiptRow label="Subtotal" value={subtotal} />
-          {tax > 0 && <ReceiptRow label="Tax / GST (10%)" value={tax} />}
-          {serviceCharge > 0 && <ReceiptRow label="Service Charge (5%)" value={serviceCharge} />}
-        </div>
-
-        <div className="mt-3">
           <DashedLine />
         </div>
 
@@ -190,6 +286,13 @@ export default function BillingInvoice({ orders }: BillingInvoiceProps) {
                 <span className="text-accent-green text-xl">✅</span>
                 <span className="font-georgia font-black text-accent-green">Paid & Settled. Thank you!</span>
               </div>
+
+              <button
+                onClick={handlePrintBill}
+                className="flex w-full items-center justify-center gap-2 rounded-2xl border-2 border-primary bg-primary/10 py-3 font-georgia text-sm font-bold text-primary hover:bg-primary/20 transition-colors active:scale-95"
+              >
+                <span>🖨️</span> Print Bill Receipt
+              </button>
 
               <button
                 onClick={handleShareWhatsApp}
@@ -217,21 +320,27 @@ export default function BillingInvoice({ orders }: BillingInvoiceProps) {
                 <span>Pay ₹{grandTotal} (UPI / GPay / PhonePe / QR)</span>
               </button>
 
-              <div className="flex gap-2">
+              <div className="grid grid-cols-3 gap-2">
+                <button
+                  onClick={handlePrintBill}
+                  className="flex items-center justify-center gap-1 rounded-2xl border border-border bg-surface py-2.5 text-xs font-bold text-text-dark hover:bg-white transition-colors"
+                >
+                  <span>🖨️</span> Print
+                </button>
                 <button
                   onClick={() => {
                     setShowOriginalScanner(true);
                     setShowUpiModal(true);
                   }}
-                  className="flex-1 flex items-center justify-center gap-1.5 rounded-2xl border border-border bg-surface py-2.5 text-xs font-bold text-text-dark hover:bg-white transition-colors"
+                  className="flex items-center justify-center gap-1 rounded-2xl border border-border bg-surface py-2.5 text-xs font-bold text-text-dark hover:bg-white transition-colors"
                 >
-                  <span>📷</span> Counter QR
+                  <span>📷</span> QR
                 </button>
                 <button
                   onClick={() => setCashSelected(true)}
-                  className="flex-1 flex items-center justify-center gap-1.5 rounded-2xl border border-border bg-surface py-2.5 text-xs font-bold text-text-dark hover:bg-white transition-colors"
+                  className="flex items-center justify-center gap-1 rounded-2xl border border-border bg-surface py-2.5 text-xs font-bold text-text-dark hover:bg-white transition-colors"
                 >
-                  <span>💵</span> Pay Cash
+                  <span>💵</span> Cash
                 </button>
               </div>
 
@@ -413,6 +522,7 @@ function InvoiceRow({
   name,
   imageUrl,
   quantity,
+  unitPrice,
   total,
   notes,
   isPending = false,
@@ -420,6 +530,7 @@ function InvoiceRow({
   name: string;
   imageUrl: string;
   quantity: number;
+  unitPrice: number;
   total: number;
   notes?: string;
   isPending?: boolean;
@@ -431,10 +542,15 @@ function InvoiceRow({
           <div className="relative h-6 w-6 flex-shrink-0 overflow-hidden rounded">
             <Image src={imageUrl} alt={name} fill sizes="24px" className="object-cover" />
           </div>
-          <span className={`text-xs font-bold ${isPending ? 'text-primary' : 'text-text-dark'}`}>
-            {name} x{quantity}
-            {isPending ? ' (Cart)' : ''}
-          </span>
+          <div>
+            <span className={`text-xs font-bold ${isPending ? 'text-primary' : 'text-text-dark'}`}>
+              {name}
+              {isPending ? ' (Cart)' : ''}
+            </span>
+            <p className="text-[10px] font-semibold text-text-muted">
+              ₹{unitPrice} × {quantity}
+            </p>
+          </div>
         </div>
         <span className="font-georgia font-black text-text-dark text-xs">₹{total.toFixed(0)}</span>
       </div>
